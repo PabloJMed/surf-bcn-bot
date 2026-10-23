@@ -1,0 +1,198 @@
+# Configuración del bot de surf BCN → Sitges.
+# Todos los umbrales viven aquí: se calibran sin tocar código (ver README).
+
+[general]
+title = "Surf BCN → Sitges"
+timezone = "Europe/Madrid"
+send_after = "06:30"          # envía en la primera ejecución a partir de esta hora local
+
+[api]
+marine_url = "https://marine-api.open-meteo.com/v1/marine"
+forecast_url = "https://api.open-meteo.com/v1/forecast"
+peak_model = "ecmwf_wam025"   # único modelo que da wave_peak_period en esta costa
+attempts = 3
+backoff_seconds = 1           # espera 1 s, luego 2 s
+timeout_seconds = 30
+
+[rules]
+# Periodo. Todos los umbrales de periodo son de PICO.
+peak_factor = 1.13            # si falta el pico: pico ≈ medio × 1.13 (medido en 72 h, rango 0.92–1.24)
+t_estimated_margin = 0.4      # con pico estimado, el veto de periodo se relaja este margen
+
+# Techo de peligro continuo con el periodo:
+# techo(T) = heff_danger × clamp(1 − slope·(T − ref), min_factor, 1)
+danger_period_ref = 6.0
+danger_period_slope = 0.055
+danger_period_min_factor = 0.80
+
+# Puntuación base: 0.5·size + 0.5·period, acotada a min(size, period) + margen
+base_cap_margin = 2.0
+swell_ratio = 0.6             # swell ≥ 0.6 × ola total → +swell_bonus
+swell_bonus = 0.5
+
+# Pinzas del modelo acumulativo
+small_day_cap = 6.0           # pinza A: Heff < heff_ideal_min del nivel → máximo 6.0
+cumulative_floor = 4.8        # pinza B: si un nivel inferior es 🟢/🟡, este no baja de 4.8
+
+# Veredictos
+verdict_green = 6.5
+verdict_yellow = 4.5
+doubt_margin = 0.5            # a menos de esto de un umbral → "dudoso"
+window_min_hours = 2          # ventana de 1 h → como mucho 🟡 y no hace sonar el aviso
+notify_min = 5.5              # suena si algún nivel tiene ≥ 2 h seguidas con media ≥ esto
+
+period_curve = [[3.8, 0], [4.2, 2.0], [4.6, 4.0], [5.0, 5.5], [5.5, 7.0], [6.0, 8.0], [6.5, 9.0], [7.0, 9.5], [8.0, 10]]
+
+[rules.wind]
+# rel = ángulo entre el origen del viento y el terral del spot (facing + 180)
+offshore_max_rel = 60
+cross_max_rel = 120
+# [límite km/h, ajuste]: se usa el primer tramo con velocidad ≤ límite
+offshore = [[15, 1.0], [25, 0.0], [999, -3.0]]
+cross = [[10, 0.0], [18, -2.0], [999, -4.0]]
+onshore = [[8, -1.0], [15, -3.0], [999, -5.0]]   # por encima de onshore_veto del nivel: veto
+
+# --- Niveles -----------------------------------------------------------------
+# Regla de oro del modelo acumulativo: heff_danger, wind_max, gust_max y onshore_veto
+# nunca bajan al subir de nivel; flat_threshold y t_peak_min nunca suben.
+# Los tests lo comprueban.
+
+[levels.principiante]
+label = "Principiante"
+heff_danger = 1.10            # calibrar con data/history.csv; el encargo original proponía 1.50
+wind_max = 35
+gust_max = 45
+flat_threshold = 0.30
+t_peak_min = 3.8
+onshore_veto = 22
+heff_ideal_min = 0.45
+size_curve = [[0.30, 0], [0.40, 3], [0.50, 6], [0.60, 8], [0.70, 10], [0.85, 10], [0.95, 7], [1.05, 3], [1.10, 0]]
+
+[levels.intermedio]
+label = "Intermedio"
+heff_danger = 1.80
+wind_max = 38
+gust_max = 50
+flat_threshold = 0.30
+t_peak_min = 3.8
+onshore_veto = 24
+heff_ideal_min = 0.75
+# La rama izquierda no baja de 4: suelo "longboard" del modelo acumulativo.
+size_curve = [[0.30, 4.0], [0.55, 4.0], [0.65, 5.0], [0.80, 7.5], [0.95, 9.0], [1.10, 10], [1.50, 10], [1.65, 8], [1.80, 3]]
+
+[levels.avanzado]
+label = "Avanzado"
+heff_danger = 2.80
+wind_max = 45
+gust_max = 58
+flat_threshold = 0.25
+t_peak_min = 3.7
+onshore_veto = 26
+heff_ideal_min = 1.10
+size_curve = [[0.25, 4.0], [0.70, 4.0], [0.90, 5.0], [1.10, 7.0], [1.30, 9.0], [1.60, 10], [2.20, 10], [2.50, 8], [2.80, 3]]
+
+# --- Tabla sugerida ---------------------------------------------------------
+# Índice de empuje P = Heff × T_pico (m·s). [límite, tabla]: primera con P < límite.
+
+[boards.principiante]
+cuts = [[999, "softboard"]]
+big_warning = 0.85            # Heff > esto → "día grande para ti, solo acompañado"
+
+[boards.intermedio]
+cuts = [[4.0, "longboard"], [7.0, "funboard-mini"], [999, "shortboard"]]
+
+[boards.avanzado]
+cuts = [[4.5, "longboard"], [7.5, "funboard-mini"], [14.0, "shortboard"], [999, "shortboard step-up"]]
+
+# --- Avisos -------------------------------------------------------------------
+
+[alerts]
+rain_mm_48h = 15
+rain_spots = ["barceloneta", "bogatell"]
+cleanup_onshore_mean = 15     # km/h de media de mar en las 24 h previas
+cleanup_calm_max = 10         # hoy terral, o viento ≤ esto
+# [temperatura mínima °C, neopreno]
+wetsuit = [[23, "lycra o shorty"], [20, "shorty o 3/2"], [17, "3/2"], [14, "4/3"], [-99, "4/3 con escarpines"]]
+
+# --- Spots ----------------------------------------------------------------------
+# facing: hacia dónde mira la playa (de dónde entra un swell de frente). Terral = facing + 180.
+# exposure: multiplicador calibrable de la altura. levels: niveles para los que se recomienda.
+# overrides.<nivel>: endurece un umbral del nivel en ese spot.
+
+[spots.barceloneta]
+name = "Barceloneta / Sant Sebastià"
+short = "Barceloneta"
+marine = [41.372, 2.200]
+wind = [41.378, 2.192]
+facing = 135
+exposure = 1.0
+levels = ["principiante", "intermedio", "avanzado"]
+note = "Fondo que cae rápido: shorebreak. Mucha gente."
+webcam_url = ""
+
+[spots.bogatell]
+name = "Bogatell / Nova Mar Bella"
+short = "Bogatell"
+marine = [41.390, 2.215]
+wind = [41.394, 2.207]
+facing = 140
+exposure = 1.0
+levels = ["principiante", "intermedio", "avanzado"]
+note = "El spot más surfeado de BCN. Corrientes junto a los espigones."
+webcam_url = ""
+
+[spots.castelldefels]
+name = "Castelldefels"
+short = "Castelldefels"
+marine = [41.258, 1.985]
+wind = [41.265, 1.980]
+facing = 150
+exposure = 1.0
+levels = ["principiante", "intermedio", "avanzado"]
+note = "Playa larga y tendida, ideal para empezar. Necesita swell de E–S."
+webcam_url = ""
+
+[spots.castelldefels.overrides.principiante]
+heff_danger = 0.95            # shorebreak con tamaño
+
+[spots.ginesta]
+name = "Port Ginesta"
+short = "Ginesta"
+marine = [41.252, 1.932]
+wind = [41.259, 1.928]
+facing = 155
+exposure = 1.0
+levels = ["principiante", "intermedio", "avanzado"]
+note = "Junto al puerto. Rip junto al espigón."
+webcam_url = ""
+
+[spots.ginesta.overrides.principiante]
+heff_danger = 0.60            # rip del espigón
+
+[spots.garraf]
+name = "Garraf"
+short = "Garraf"
+marine = [41.245, 1.902]
+wind = [41.251, 1.901]
+facing = 165
+exposure = 1.0
+levels = ["intermedio", "avanzado"]   # rocas y corrientes: nunca principiante
+note = "Rocas y corrientes."
+webcam_url = ""
+
+[spots.garraf.overrides.intermedio]
+heff_danger = 1.50
+
+[spots.garraf.overrides.avanzado]
+heff_danger = 2.20            # fondo de roca
+
+[spots.sitges]
+name = "Sitges"
+short = "Sitges"
+marine = [41.228, 1.815]
+wind = [41.234, 1.810]
+facing = 160
+exposure = 1.0
+levels = ["principiante", "intermedio", "avanzado"]
+note = "Fondo tendido, de lo mejor para principiantes."
+webcam_url = ""
