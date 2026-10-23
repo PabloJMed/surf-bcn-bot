@@ -271,6 +271,9 @@ class DayVerdict:
     wind_direction: float = 0.0
     wind_kind: str = ""
     timeline: list[tuple[int, str, str]] = field(default_factory=list)  # (hora, veredicto, motivo)
+    star_window: tuple[int, int] | None = None   # mejor franja real (≥ window_min_hours horas)
+    star_score: float = 0.0
+    stars: int = 0
 
     @property
     def good(self) -> bool:
@@ -333,10 +336,15 @@ def day_verdict(series: list[tuple[Hour, HourScore]], spot_id: str, level_id: st
         s = scores[best]
         dv = DayVerdict(spot_id, level_id, day, s.verdict, s.display, reason=s.reason)
 
-    # Aviso sonoro: ≥ min_h horas seguidas con puntuación real (sin pinzas) suficiente.
-    nruns = _runs(times, [s.notify >= y for s in scores])
-    dv.notify = any(b - a + 1 >= min_h and mean(s.notify for s in scores[a:b + 1]) >= rules["notify_min"]
-                    for a, b in nruns)
+    # Nota real (sin las pinzas de cortesía del modelo acumulativo): decide el sonido del
+    # aviso y las estrellas. Solo cuentan franjas de al menos min_h horas seguidas.
+    nruns = [(a, b) for a, b in _runs(times, [s.notify >= y for s in scores]) if b - a + 1 >= min_h]
+    dv.notify = any(mean(s.notify for s in scores[a:b + 1]) >= rules["notify_min"] for a, b in nruns)
+    if nruns:
+        a, b = max(nruns, key=lambda r: (mean(s.notify for s in scores[r[0]:r[1] + 1]), r[1] - r[0]))
+        dv.star_window = (times[a].hour, times[b].hour + 1)
+        dv.star_score = mean(s.notify for s in scores[a:b + 1])
+        chosen = list(range(a, b + 1))      # las condiciones que se cuentan son las de esa franja
 
     hours = [series[i][0] for i in chosen]
     dv.start = hours[0].time
@@ -350,8 +358,20 @@ def day_verdict(series: list[tuple[Hour, HourScore]], spot_id: str, level_id: st
     dv.wind_kind = (CALM if round(dv.wind_speed) <= rules["wind"]["calm_max"]
                     else scores[chosen[len(chosen) // 2]].wind_kind)
     dv.board = board_for(level_id, dv.heff, dv.period, config)
-    dv.timeline = [(h.time.hour, s.verdict, s.reason) for h, s in series]
+    # La tira horaria enseña la nota real de cada hora, no la de cortesía.
+    dv.timeline = [(h.time.hour, s.verdict if s.vetoed else verdict_for(s.notify, rules), s.reason)
+                   for h, s in series]
+    dv.stars = stars_for(dv.star_score, config) if dv.star_window else 0
     return dv
+
+
+def stars_for(score: float, config: Config) -> int:
+    """0–5 estrellas según la nota media real de la mejor franja."""
+    stars = 0
+    for cut, n in config.stars["cuts"]:
+        if score >= cut:
+            stars = n
+    return stars
 
 
 def evaluate_spot_day(sf: SpotForecast, spot: Spot, config: Config,
@@ -367,6 +387,16 @@ def evaluate_spot_day(sf: SpotForecast, spot: Spot, config: Config,
 # --- Resumen del día -------------------------------------------------------------
 
 @dataclass
+class BeachDay:
+    """Una playa en un día: sus estrellas son las del nivel que mejor lo tiene."""
+    spot_id: str
+    stars: int
+    best: DayVerdict               # el nivel más bajo con esas estrellas
+    levels: list[DayVerdict]       # los niveles aptos en esa playa, de menor a mayor
+    top_levels: list[str]          # los niveles que alcanzan esas estrellas
+
+
+@dataclass
 class DaySummary:
     day: date
     verdicts: dict[str, dict[str, DayVerdict]]   # spot → nivel → veredicto
@@ -376,10 +406,24 @@ class DaySummary:
     cleanup: bool = False
     rain_mm: float = 0.0
     sst: float | None = None
+    beaches: list[BeachDay] = field(default_factory=list)   # en el orden de config (N → S)
 
     @property
     def good(self) -> bool:
         return self.headline.good
+
+    @property
+    def starred(self) -> list[BeachDay]:
+        """Las playas con al menos una estrella, de mejor a peor."""
+        return sorted((b for b in self.beaches if b.stars > 0),
+                      key=lambda b: (b.stars, rank_key(b.best)), reverse=True)
+
+
+def beach_day(spot: Spot, verdicts: dict[str, DayVerdict], config: Config) -> BeachDay:
+    levels = [verdicts[lv.id] for lv in config.levels if spot.allows(lv.id)]
+    top = max(dv.stars for dv in levels)
+    best = next(dv for dv in levels if dv.stars == top)
+    return BeachDay(spot.id, top, best, levels, [dv.level for dv in levels if dv.stars == top])
 
 
 def rank_key(dv: DayVerdict):
@@ -459,6 +503,7 @@ def summarize_day(data: dict[str, SpotForecast], config: Config, day: date,
                  for lv in config.levels if s.allows(lv.id))
     cleanup = headline.good and is_cleanup_day(
         data[headline.spot_id], config.spot(headline.spot_id), headline, config)
+    beaches = [beach_day(s, verdicts[s.id], config) for s in config.spots if s.id in verdicts]
     return DaySummary(day=day, verdicts=verdicts, best=best, headline=headline, notify=notify,
                       cleanup=cleanup, rain_mm=rain_48h(data, config, rain_ref),
-                      sst=sea_temperature(data, day))
+                      sst=sea_temperature(data, day), beaches=beaches)

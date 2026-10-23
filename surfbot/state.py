@@ -14,7 +14,7 @@ from .score import DaySummary
 HISTORY_FIELDS = [
     "run_date", "day", "spot", "level", "heff", "wave_height", "period", "t_estimated",
     "wave_dir", "wind_kmh", "wind_dir", "wind_kind", "score", "verdict", "window",
-    "reason", "notify",
+    "reason", "notify", "stars", "star_window",
 ]
 
 
@@ -73,6 +73,8 @@ def history_rows(run_date: str, summaries: list[DaySummary], config: Config) -> 
                     "window": f"{dv.window[0]}-{dv.window[1]}" if dv.window else "",
                     "reason": dv.reason,
                     "notify": int(dv.notify),
+                    "stars": dv.stars,
+                    "star_window": f"{dv.star_window[0]}-{dv.star_window[1]}" if dv.star_window else "",
                 })
     return rows
 

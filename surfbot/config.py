@@ -51,6 +51,7 @@ class Config:
     boards: dict
     alerts: dict
     spots: tuple[Spot, ...]
+    stars: dict
 
     def spot(self, spot_id: str) -> Spot:
         for s in self.spots:
@@ -110,6 +111,7 @@ def parse_config(data: dict) -> Config:
         boards=data["boards"],
         alerts=data["alerts"],
         spots=spots,
+        stars=data["stars"],
     )
 
 

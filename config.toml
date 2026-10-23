@@ -2,9 +2,11 @@
 # Todos los umbrales viven aquí: se calibran sin tocar código (ver README).
 
 [general]
-title = "Surf BCN → Sitges"
+title = "Surf BCN"
 timezone = "Europe/Madrid"
 send_after = "06:30"          # envía en la primera ejecución a partir de esta hora local
+strip_from = 7                # la tira horaria va de las 7 h…
+strip_to = 19                 # …a las 19 h; las horas sin luz salen como 🌙
 
 [api]
 marine_url = "https://marine-api.open-meteo.com/v1/marine"
@@ -100,6 +102,13 @@ onshore_veto = 26
 heff_ideal_min = 1.10
 size_curve = [[0.25, 4.0], [0.70, 4.0], [0.90, 5.0], [1.10, 7.0], [1.30, 9.0], [1.60, 10], [2.20, 10], [2.50, 8], [2.80, 3]]
 
+# --- Estrellas ---------------------------------------------------------------
+# Nota media de la mejor franja del día (al menos window_min_hours horas seguidas).
+# 1 = se puede intentar (🟡) · 2 o más = buenas condiciones (🟢) · 5 = día idílico.
+# Sin franja aprovechable: ☆ (no recomendable).
+[stars]
+cuts = [[4.5, 1], [6.5, 2], [7.5, 3], [8.5, 4], [9.3, 5]]
+
 # --- Tabla sugerida ---------------------------------------------------------
 # Índice de empuje P = Heff × T_pico (m·s). [límite, tabla]: primera con P < límite.
 
@@ -123,21 +132,32 @@ cleanup_calm_max = 10         # hoy terral, o viento ≤ esto
 # [temperatura mínima °C, neopreno]
 wetsuit = [[23, "lycra o shorty"], [20, "shorty o 3/2"], [17, "3/2"], [14, "4/3"], [-99, "4/3 con escarpines"]]
 
-# --- Spots ----------------------------------------------------------------------
+# --- Spots (de norte a sur: es el orden del resumen) ------------------------------
 # facing: hacia dónde mira la playa (de dónde entra un swell de frente). Terral = facing + 180.
 # exposure: multiplicador calibrable de la altura. levels: niveles para los que se recomienda.
 # overrides.<nivel>: endurece un umbral del nivel en ese spot.
 
-[spots.barceloneta]
-name = "Barceloneta / Sant Sebastià"
-short = "Barceloneta"
-marine = [41.372, 2.200]
-wind = [41.378, 2.192]
-facing = 135
+[spots.masnou]
+name = "El Masnou / Ocata"
+short = "Masnou"
+marine = [41.470, 2.330]
+wind = [41.478, 2.316]
+facing = 135                  # entra con mar del ESE; terral del NO (surf-forecast)
 exposure = 1.0
 levels = ["principiante", "intermedio", "avanzado"]
-note = "Fondo que cae rápido: shorebreak. Mucha gente."
-webcam_url = "https://www.surf-forecast.com/breaks/Barceloneta/webcams/latest"
+note = "Bajo de arena expuesto. Se llena cuando funciona."
+webcam_url = "https://www.surf-forecast.com/breaks/Masnou/webcams/latest"
+
+[spots.montgat]
+name = "Montgat"
+short = "Montgat"
+marine = [41.450, 2.320]      # mar adentro para no caer en la celda de Bogatell
+wind = [41.463, 2.280]
+facing = 135                  # entra con mar del SE; terral del NO (surf-forecast)
+exposure = 1.0
+levels = ["intermedio", "avanzado"]   # corrientes peligrosas: no para principiante
+note = "Bajo de arena. Corrientes peligrosas y suele haber gente."
+webcam_url = "https://www.surf-forecast.com/breaks/Montgat/webcams/latest"
 
 [spots.bogatell]
 name = "Bogatell / Nova Mar Bella"
@@ -149,6 +169,17 @@ exposure = 1.0
 levels = ["principiante", "intermedio", "avanzado"]
 note = "El spot más surfeado de BCN. Corrientes junto a los espigones."
 webcam_url = "https://www.surf-forecast.com/breaks/Bogatell/webcams/latest"
+
+[spots.barceloneta]
+name = "Barceloneta / Sant Sebastià"
+short = "Barceloneta"
+marine = [41.372, 2.200]
+wind = [41.378, 2.192]
+facing = 135
+exposure = 1.0
+levels = ["principiante", "intermedio", "avanzado"]
+note = "Fondo que cae rápido: shorebreak. Mucha gente."
+webcam_url = "https://www.surf-forecast.com/breaks/Barceloneta/webcams/latest"
 
 [spots.prat]
 name = "Platja del Prat"

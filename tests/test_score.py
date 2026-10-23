@@ -296,6 +296,27 @@ class TestDay(unittest.TestCase):
         self.assertFalse(s.notify)
 
 
+class TestStars(unittest.TestCase):
+    def test_scale(self):
+        from surfbot.score import stars_for
+        expected = {4.4: 0, 4.5: 1, 6.4: 1, 6.5: 2, 7.5: 3, 8.5: 4, 9.2: 4, 9.3: 5, 10: 5}
+        for score, n in expected.items():
+            self.assertEqual(stars_for(score, CFG), n, score)
+
+    def test_one_good_hour_is_no_star(self):
+        rows = [(h, 0.8, 7, MAR if h != 11 else TERRAL, 25 if h != 11 else 8, 135) for h in range(9, 14)]
+        sf = forecast(BCN, rows)
+        dv = day_verdict(level_series(sf, BCN, "principiante"), BCN.id, "principiante", DAY, CFG)
+        self.assertEqual(dv.stars, 0)
+
+    def test_idyllic_day(self):
+        rows = [(h, 0.8, 9, TERRAL, 8, 135) for h in range(9, 14)]
+        sf = forecast(BCN, rows)
+        dv = day_verdict(level_series(sf, BCN, "principiante"), BCN.id, "principiante", DAY, CFG)
+        self.assertEqual(dv.stars, 5)
+        self.assertEqual(dv.star_window, (9, 14))
+
+
 class TestRanking(unittest.TestCase):
     def test_several_hours_beat_a_single_better_hour(self):
         one = DayVerdict("a", "principiante", DAY, YELLOW, 6.2, window=(12, 13), single_hour=True)

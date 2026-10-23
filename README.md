@@ -1,7 +1,7 @@
 # surf-bcn-bot
 
 Bot que cada mañana, hacia las 7:00 hora de Madrid, manda por Telegram si **hoy y mañana**
-merece la pena surfear entre Barcelona y Sitges, en qué spot, en qué franja y con qué tabla.
+merece la pena surfear entre El Masnou y Sitges, en qué spot, en qué franja y con qué tabla.
 Evalúa a la vez **tres niveles**: principiante, intermedio y avanzado.
 
 La prioridad es el realismo: prefiere decir "no merece la pena" a mandarte al agua con mar de
@@ -14,47 +14,40 @@ Python ≥ 3.11, solo librería estándar. Se ejecuta en GitHub Actions.
 Cada mañana llegan **dos mensajes**: uno para hoy y otro para mañana, cada uno con su propio aviso.
 
 ```
-🏄 Surf BCN → Sitges · MAÑANA sáb 24 oct
+🏄🌊 Surf BCN · MAÑANA sáb 24 oct
 
-🟢 MERECE LA PENA 🤔
-⭐ Mejor playa: Barceloneta, de 8 a 15 h
- 8h 🟡🟢🟢🟢🟢🟢🟡🔴🔴🔴🔴 19h
-🌊 Olas de 0,6 m · periodo 4,5 s · entran del E
-💨 Viento terral (de tierra, ordena la ola) del O, 7 km/h
-⏱️ Desde las 15 h: viento de mar 9 km/h
-🤔 Al límite: mira la webcam antes de ir
+Resumen · mejor franja de cada playa
+⭐ Masnou · 8–13 h · principiante
+☆ Montgat
+⭐ Bogatell · 8–15 h · principiante
+⭐ Barceloneta · 8–15 h · principiante
+☆ El Prat
+☆ Castelldefels
+☆ Ginesta
+☆ Garraf
+☆ Sitges
 
-Por nivel
-• Principiante: 🟢 Barceloneta, 8–15 h · softboard 🤔
-• Intermedio: 🟡 Ginesta, 9–13 h · pequeño, mejor longboard
-• Avanzado: 🟡 Ginesta, 9–13 h · pequeño, mejor longboard
-
-También se puede intentar (principiante)
-• 🟡 Bogatell, 8–15 h 🤔
-• 🟡 Castelldefels, 9–13 h
-
-📷 Webcams: Barceloneta · Ginesta
-
-🌡️ Agua 22 °C → shorty o 3/2
-🟢 merece la pena · 🟡 justito · 🔴 no merece la pena · 🤔 dudoso
-Datos: Open-Meteo.com (CC BY 4.0)
+━━━━━━━━━━━━
+⭐ Barceloneta · mejor de 8 a 15 h
+ 7h 🌙🟡🟡🟡🟡🟡🟡🟡🔴🔴🔴🔴 19h
+🟡 8–15 h · 🔴 15–19 h: viento de mar 9 km/h
+🌊 0,6 m · 4,6 s · del E · 💨 terral del O, 7 km/h
+🏄 Principiante ⭐ softboard · Intermedio ☆ pequeño · Avanzado ☆ pequeño
+📷 webcam de Barceloneta
+…
 ```
 
-Un día malo es una sola línea: `🔴 NO MERECE LA PENA · viento de mar 25 km/h: revuelto`.
-
-- **⭐ Mejor playa** es la recomendación del día. **La franja** ("de 8 a 15 h") es el tramo seguido más largo de horas de luz que son al
-  menos 🟡 en esa playa. La **tira de bolas** es cada hora de luz de esa playa, de izquierda a
-  derecha, y las líneas ⏱️ dicen qué estropea el mar justo antes y justo después de la franja.
-- El titular es la mejor playa para el nivel más bajo que tiene día; debajo, **una línea por nivel**,
-  siempre con playa, franja y tabla sugerida.
-- **También se puede intentar**: el resto de playas, solo las que no están en rojo y tienen al menos 2 horas
-  seguidas aprovechables, para el mismo nivel que el titular, cada una con su detalle (franja,
-  tira horaria, ola, viento y qué la estropea). Las demás no se mencionan. A igual color, una
-  franja de varias horas va siempre por delante de una hora suelta.
-- **Webcams**: solo de las playas recomendadas ese día (también las dudosas). Son páginas de
-  surf-forecast o Windfinder que reúnen las cámaras cercanas y enseñan la hora de cada imagen.
-- El aviso de cada mensaje **suena** si ese día algún nivel tiene al menos 2 horas seguidas de día
-  bueno de verdad; si no, llega en silencio. Siempre llega algo: si Open-Meteo falla, recibes
+- **Resumen**: todas las playas, de norte a sur, con estrellas según la **mejor franja del día**
+  (al menos 2 horas seguidas): ⭐ se puede intentar · ⭐⭐ o más, buenas condiciones ·
+  ⭐⭐⭐⭐⭐ día idílico · ☆ no recomendable. Si las estrellas son solo para algunos niveles,
+  se indica cuáles.
+- **Desglose**: solo de las playas con al menos una ⭐, de mejor a peor. La **tira** tiene una bola
+  por hora de 7 a 19 h (🌙 = de noche), siempre con la misma escala, y debajo las horas agrupadas
+  por color con el motivo de las malas. Luego ola, viento, estrellas y tabla por nivel y la webcam.
+- **Ninguna playa con ⭐**: un mensaje corto que lo dice y por qué, sin desglose.
+- Si un día no cabe en un mensaje de Telegram, el desglose sigue en otro, sin cortar a mitad de playa.
+- El aviso de cada día **suena** si algún nivel tiene al menos 2 horas seguidas de día bueno de
+  verdad; si no, llega en silencio. Siempre llega algo: si Open-Meteo falla, recibes
   "⚠️ Hoy no he podido obtener la previsión", para que el silencio nunca se confunda con un día flat.
 
 ## Cómo puntúa
@@ -75,6 +68,9 @@ Todo es hora a hora, entre el amanecer y el atardecer, y todos los números est�
    corta llega floja y rompe toda a la vez.
 5. **Día**: la ventana es la racha más larga de horas ≥ 4,5 y su media da el color. Una ventana de
    una sola hora queda como mucho en 🟡 y no hace sonar el aviso.
+6. **Estrellas**: la media de la nota *real* de la mejor franja de al menos 2 horas (sin las
+   pinzas de cortesía de abajo): 4,5 ⭐ · 6,5 ⭐⭐ · 7,5 ⭐⭐⭐ · 8,5 ⭐⭐⭐⭐ · 9,3 ⭐⭐⭐⭐⭐.
+   Por eso un día de 0,3 m no da estrellas a un avanzado aunque su color sea 🟡 "longboard".
 
 ### Tres niveles, modelo acumulativo
 
@@ -108,6 +104,8 @@ shortboard; avanzado longboard < 4,5 ≤ funboard-mini < 7,5 ≤ shortboard < 14
 | Spot | facing | Niveles | Notas |
 |---|---|---|---|
 | Barceloneta / Sant Sebastià | 135° | todos | Shorebreak. Mucha gente. |
+| El Masnou / Ocata | 135° | todos | Bajo de arena expuesto; se llena cuando funciona. |
+| Montgat | 135° | intermedio, avanzado | Corrientes peligrosas. |
 | Bogatell / Nova Mar Bella | 140° | todos | Corrientes junto a los espigones. |
 | Platja del Prat | 160° | todos | Larga y abierta. Tras lluvias, cerca del Llobregat. Sin webcam. |
 | Castelldefels | 150° | todos | Techo de principiante 0,95 m por el shorebreak. |

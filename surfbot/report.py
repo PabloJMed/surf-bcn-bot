@@ -1,4 +1,12 @@
-"""Compone el mensaje de Telegram (HTML). Sin red."""
+"""Compone los mensajes de Telegram (HTML), uno por día. Sin red.
+
+Estructura de cada mensaje:
+  1. Cabecera: Surf BCN, día y fecha.
+  2. Resumen: todas las playas de norte a sur con sus estrellas (☆ = no recomendable).
+  3. Desglose de las playas con al menos una estrella: tira de 7 a 19 h, franjas por color,
+     ola, viento, niveles y webcam.
+  Si ninguna playa tiene estrellas, un mensaje corto que lo dice, sin desglose.
+"""
 
 from __future__ import annotations
 
@@ -7,18 +15,19 @@ from datetime import date
 from html import escape
 
 from .config import Config
-from .score import (CALM, CROSS, EMOJI, GREEN, OFFSHORE, ONSHORE, RANK, LABEL, DaySummary, rank_key,
-                    DayVerdict, compass, fmt_num, wetsuit)
+from .score import (CALM, CROSS, DANGER, EMOJI, FLAT, GREEN, OFFSHORE, ONSHORE, RED, YELLOW,
+                    BeachDay, DaySummary, DayVerdict, compass, fmt_num, wetsuit)
 
 MAX_LEN = 4096
 DAYS = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"]
 MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
 ATTRIBUTION = "Datos: Open-Meteo.com (CC BY 4.0)"
-LEGEND = "🟢 merece la pena · 🟡 justito · 🔴 no merece la pena · 🤔 dudoso"
-WIND_HINT = {CALM: "en calma (mar liso)",
-             OFFSHORE: "terral (de tierra, ordena la ola)",
-             CROSS: "cruzado",
-             ONSHORE: "de mar (revuelve el agua)"}
+NIGHT = "🌙"
+NO_STAR = "☆"
+LEGEND = ("⭐ se puede intentar · ⭐⭐ o más, buenas condiciones · ⭐⭐⭐⭐⭐ día idílico · "
+          "☆ no recomendable\n"
+          "Horas: 🟢 buenas · 🟡 justas · 🔴 malas · ⚪ sin olas · ⛔ peligro · 🌙 de noche")
+WIND_HINT = {CALM: "calma", OFFSHORE: "terral", CROSS: "cruzado", ONSHORE: "de mar"}
 
 
 @dataclass
@@ -31,166 +40,178 @@ def fmt_date(d: date) -> str:
     return f"{DAYS[d.weekday()]} {d.day} {MONTHS[d.month - 1]}"
 
 
+def stars_text(n: int) -> str:
+    return "⭐" * n if n > 0 else NO_STAR
+
+
 def hours_text(dv: DayVerdict) -> str:
-    return f"{dv.window[0]}–{dv.window[1]} h" if dv.window else ""
+    w = dv.star_window
+    return f"{w[0]}–{w[1]} h" if w else ""
 
 
-def timeline_strip(dv: DayVerdict) -> str:
-    """Una bola por hora de luz: así se ve de dónde sale la franja."""
-    if not dv.timeline:
-        return ""
-    first, last = dv.timeline[0][0], dv.timeline[-1][0]
-    dots = "".join(EMOJI[v] for _, v, _ in dv.timeline)
-    return f"<code>{first:>2}h</code> {dots} <code>{last + 1}h</code>"
+def _level(config: Config, level_id: str):
+    return next(lv for lv in config.levels if lv.id == level_id)
 
 
-def wind_text(dv: DayVerdict, long: bool = False) -> str:
-    kind = WIND_HINT.get(dv.wind_kind, dv.wind_kind) if long else dv.wind_kind
-    if dv.wind_kind == CALM:
-        return f"💨 {'Viento ' if long else ''}{kind}, {round(dv.wind_speed)} km/h"
-    if long:
-        return f"💨 Viento {kind} del {compass(dv.wind_direction)}, {round(dv.wind_speed)} km/h"
-    return f"💨 {kind} {compass(dv.wind_direction)} {round(dv.wind_speed)} km/h"
+# --- Franjas horarias ---------------------------------------------------------------
 
-
-def outside_window(dv: DayVerdict) -> list[str]:
-    """Qué pasa justo antes y justo después de la franja buena."""
-    if not dv.window:
-        return []
+def hourly(dv: DayVerdict, config: Config) -> list[tuple[int, str | None, str]]:
+    """(hora, veredicto o None si es de noche, motivo) para cada hora de la tira."""
+    by_hour = {hh: (v, r) for hh, v, r in dv.timeline}
     out = []
-    before = [t for t in dv.timeline if t[0] < dv.window[0]]
-    after = [t for t in dv.timeline if t[0] >= dv.window[1]]
-    if before:
-        out.append(f"⏱️ Antes de las {dv.window[0]} h: {escape(before[-1][2])}")
-    if after:
-        out.append(f"⏱️ Desde las {dv.window[1]} h: {escape(after[0][2])}")
+    for hh in range(config.general["strip_from"], config.general["strip_to"]):
+        v, r = by_hour.get(hh, (None, ""))
+        out.append((hh, v, r))
     return out
 
 
-def _board_text(dv: DayVerdict, config: Config) -> str:
-    level = next(lv for lv in config.levels if lv.id == dv.level)
-    if dv.heff < level.heff_ideal_min and dv.level != config.levels[0].id:
-        text = f"pequeño, mejor {dv.board}"
-    else:
-        text = dv.board
-    big = config.boards[dv.level].get("big_warning")
-    if big is not None and dv.heff > big:
-        text += " · día grande, solo acompañado"
-    return text
+def timeline_strip(dv: DayVerdict, config: Config) -> str:
+    """Una bola por hora, de 7 a 19 h. Siempre la misma escala para aprender a leerla."""
+    dots = "".join(EMOJI[v] if v else NIGHT for _, v, _ in hourly(dv, config))
+    return (f"<code>{config.general['strip_from']:>2}h</code> {dots} "
+            f"<code>{config.general['strip_to']}h</code>")
 
 
-def level_line(dv: DayVerdict, config: Config) -> str:
-    level = next(lv for lv in config.levels if lv.id == dv.level)
-    head = f"• <b>{level.label}:</b> {EMOJI[dv.verdict]}"
-    if not dv.good:
-        return f"{head} {escape(dv.reason)}"
-    parts = [f"{escape(config.spot(dv.spot_id).short)}, {hours_text(dv)}", _board_text(dv, config)]
-    if dv.single_hour:
-        parts.append("solo 1 h buena")
-    return f"{head} " + " · ".join(parts) + (" 🤔" if dv.doubtful else "")
+def _join_ranges(ranges: list[tuple[int, int]]) -> str:
+    parts = [f"{a}–{b}" for a, b in ranges]
+    return (", ".join(parts[:-1]) + " y " + parts[-1] if len(parts) > 1 else parts[0]) + " h"
 
 
-def other_spots(s: DaySummary, config: Config) -> list[DayVerdict]:
-    """Las demás playas aptas para el nivel del titular que merecen un intento:
-    no rojas y con una franja seguida de al menos window_min_hours horas."""
-    h = s.headline
-    found = []
-    for sp in config.spots:
-        if sp.id == h.spot_id or not sp.allows(h.level) or sp.id not in s.verdicts:
+def bands_text(dv: DayVerdict, config: Config) -> str:
+    """Las horas agrupadas por color, de mejor a peor, con el motivo de las malas."""
+    runs: list[list] = []                       # [veredicto, desde, hasta, motivo]
+    for hh, v, r in hourly(dv, config):
+        if v is None:
             continue
-        dv = s.verdicts[sp.id][h.level]
-        if dv.good and dv.window and not dv.single_hour:
-            found.append(dv)
-    return sorted(found, key=rank_key, reverse=True)
+        if runs and runs[-1][0] == v and runs[-1][2] == hh:
+            runs[-1][2] = hh + 1
+        else:
+            runs.append([v, hh, hh + 1, r])
+    parts = []
+    end = dv.star_window[1] if dv.star_window else 0
+    for v in (GREEN, YELLOW, RED, FLAT, DANGER):
+        mine = [run for run in runs if run[0] == v]
+        if not mine:
+            continue
+        text = f"{EMOJI[v]} {_join_ranges([(a, b) for _, a, b, _ in mine])}"
+        if v in (RED, FLAT, DANGER):
+            # El motivo que importa es el que cierra la franja buena; si no, el primero.
+            after = [run for run in mine if run[1] >= end] or mine
+            text += f": {escape(after[0][3])}"
+        parts.append(text)
+    return " · ".join(parts)
 
 
-def spot_detail(dv: DayVerdict, config: Config) -> list[str]:
-    """Detalle compacto de una playa: franja, tira horaria, ola, viento y qué la estropea."""
-    t = fmt_num(dv.period) + (" s*" if dv.t_estimated else " s")
-    lines = [
-        f"📍 <b>{escape(config.spot(dv.spot_id).short)}</b> · {EMOJI[dv.verdict]} "
-        f"{LABEL[dv.verdict].lower()}, de {dv.window[0]} a {dv.window[1]} h" + (" 🤔" if dv.doubtful else ""),
-        timeline_strip(dv),
-        f"🌊 {fmt_num(dv.heff)} m · {t} · del {compass(dv.wave_direction)} · " + wind_text(dv),
-    ]
-    return lines + outside_window(dv)
+# --- Bloques ------------------------------------------------------------------------
 
-
-def webcams(s: DaySummary, config: Config) -> str:
-    """Enlaces solo a las playas recomendadas ese día (incluidas las dudosas)."""
-    ids: list[str] = []
-    for dv in [s.headline] + [s.best[lv.id] for lv in config.levels if lv.id in s.best]:
-        if dv.good and dv.spot_id not in ids:
-            ids.append(dv.spot_id)
-    links = [f'<a href="{escape(config.spot(i).webcam_url, quote=True)}">{escape(config.spot(i).short)}</a>'
-             for i in ids if config.spot(i).webcam_url]
-    return "📷 Webcams: " + " · ".join(links) if links else ""
-
-
-def day_body(s: DaySummary, config: Config) -> list[str]:
-    h = s.headline
-    if not s.good:
-        # Día malo: una sola línea.
-        return [f"<b>{EMOJI[h.verdict]} {LABEL[h.verdict]}</b> · {escape(h.reason)}"]
-    level = next(lv for lv in config.levels if lv.id == h.level)
-    spot = config.spot(h.spot_id)
-    t = fmt_num(h.period) + (" s*" if h.t_estimated else " s")
-    lines = [
-        f"<b>{EMOJI[h.verdict]} {LABEL[h.verdict]}</b>" + (" 🤔" if h.doubtful else ""),
-        f"⭐ <b>Mejor playa: {escape(spot.short)}</b>, de {h.window[0]} a {h.window[1]} h"
-        + (f" ({level.label.lower()})" if h.level != config.levels[0].id else ""),
-        timeline_strip(h),
-        f"🌊 Olas de {fmt_num(h.heff)} m · periodo {t} · entran del {compass(h.wave_direction)}",
-        wind_text(h, long=True),
-    ]
-    lines += outside_window(h)
-    if h.doubtful:
-        lines.append("🤔 Al límite: mira la webcam antes de ir")
-    if s.cleanup:
-        lines.append("🧹 Día de limpieza: ayer hubo viento de mar y hoy se ordena")
-    if s.rain_mm >= config.alerts["rain_mm_48h"]:
-        lines.append(f"💩 {round(s.rain_mm)} mm de lluvia en 48 h: evita el baño y aléjate "
-                     "de las desembocaduras (Llobregat, Besòs)")
-    if h.t_estimated:
-        lines.append("* periodo estimado: hoy no hay dato de pico")
-    lines += ["", "<b>Por nivel</b>"]
-    lines += [level_line(s.best[lv.id], config) for lv in config.levels if lv.id in s.best]
-    others = other_spots(s, config)
-    if others:
-        lines += ["", f"<b>También se puede intentar</b> ({level.label.lower()})"]
-        for dv in others:
-            lines += [""] + spot_detail(dv, config)
-    cams = webcams(s, config)
-    if cams:
-        lines += ["", cams]
+def summary_lines(s: DaySummary, config: Config) -> list[str]:
+    lines = ["<b>Resumen</b> · mejor franja de cada playa"]
+    for b in s.beaches:
+        name = escape(config.spot(b.spot_id).short)
+        if b.stars == 0:
+            lines.append(f"{NO_STAR} {name}")
+            continue
+        line = f"{stars_text(b.stars)} <b>{name}</b> · {hours_text(b.best)}"
+        allowed = [dv.level for dv in b.levels]
+        if b.top_levels != allowed:
+            line += " · " + ", ".join(_level(config, l).label.lower() for l in b.top_levels)
+        lines.append(line)
     return lines
 
 
-def day_message(title: str, s: DaySummary, config: Config) -> Message:
-    """Un mensaje por día, con su propio aviso sonoro."""
-    lines = [f"🏄 <b>{escape(config.general['title'])}</b> · <b>{title}</b> {fmt_date(s.day)}", ""]
-    lines += day_body(s, config)
-    lines.append("")
+def _board_text(dv: DayVerdict, config: Config) -> str:
+    level = _level(config, dv.level)
+    text = dv.board
+    if dv.heff < level.heff_ideal_min and dv.level != config.levels[0].id:
+        text += " (pequeño)"
+    big = config.boards[dv.level].get("big_warning")
+    if big is not None and dv.heff > big:
+        text += ", día grande: solo acompañado"
+    return text
+
+
+def levels_line(b: BeachDay, config: Config) -> str:
+    parts = []
+    for dv in b.levels:
+        label = _level(config, dv.level).label
+        if dv.stars > 0:
+            parts.append(f"{label} {stars_text(dv.stars)} {_board_text(dv, config)}")
+        elif dv.verdict == DANGER:
+            parts.append(f"{label} ⛔ demasiado para tu nivel")
+        elif dv.heff < _level(config, dv.level).heff_ideal_min:
+            parts.append(f"{label} {NO_STAR} pequeño")
+        else:
+            parts.append(f"{label} {NO_STAR}")
+    return "🏄 " + " · ".join(parts)
+
+
+def beach_detail(b: BeachDay, config: Config) -> list[str]:
+    dv = b.best
+    spot = config.spot(b.spot_id)
+    t = fmt_num(dv.period) + (" s*" if dv.t_estimated else " s")
+    wind = (f"💨 calma, {round(dv.wind_speed)} km/h" if dv.wind_kind == CALM else
+            f"💨 {WIND_HINT.get(dv.wind_kind, dv.wind_kind)} del {compass(dv.wind_direction)}, "
+            f"{round(dv.wind_speed)} km/h")
+    lines = [
+        f"{stars_text(b.stars)} <b>{escape(spot.short)}</b> · mejor de "
+        f"{dv.star_window[0]} a {dv.star_window[1]} h",
+        timeline_strip(dv, config),
+        bands_text(dv, config),
+        f"🌊 {fmt_num(dv.heff)} m · {t} · del {compass(dv.wave_direction)} · {wind}",
+        levels_line(b, config),
+    ]
+    if dv.t_estimated:
+        lines.append("* periodo estimado: hoy no hay dato de pico")
+    if spot.webcam_url:
+        lines.append(f'📷 <a href="{escape(spot.webcam_url, quote=True)}">webcam de {escape(spot.short)}</a>')
+    return lines
+
+
+def day_messages(title: str, s: DaySummary, config: Config) -> list[Message]:
+    """Los mensajes de un día: normalmente uno. Si el desglose no cabe en el límite de
+    Telegram, sigue en otro mensaje (sin sonido), sin cortar nunca a mitad de playa."""
+    header = f"🏄🌊 <b>{escape(config.general['title'])}</b> · <b>{title}</b> {fmt_date(s.day)}"
+    starred = s.starred
+    head = [header, ""]
+    blocks: list[list[str]] = []
+    if not starred:
+        # Ninguna playa recomendable: lo decimos y ya, sin desglose.
+        h = s.headline
+        head += [f"😴 <b>{title.capitalize()} no merece la pena en ninguna playa</b>",
+                 f"{EMOJI[h.verdict]} {escape(h.reason)}"]
+    else:
+        head += summary_lines(s, config)
+        if s.cleanup:
+            head.append("🧹 Día de limpieza: ayer hubo viento de mar y hoy se ordena")
+        if s.rain_mm >= config.alerts["rain_mm_48h"]:
+            head.append(f"💩 {round(s.rain_mm)} mm de lluvia en 48 h: evita el baño y aléjate "
+                        "de las desembocaduras (Llobregat, Besòs)")
+        blocks = [["", "━━━━━━━━━━━━"] + beach_detail(b, config) for b in starred]
+    foot = [""]
     if s.sst is not None:
-        lines.append(f"🌡️ Agua {round(s.sst)} °C → {wetsuit(s.sst, config)}")
-    if s.good:
-        lines.append(f"<i>{LEGEND}</i>")
-    lines.append(f"<i>{ATTRIBUTION}</i>")
-    text = "\n".join(lines)
-    if len(text) > MAX_LEN:
-        text = text[:MAX_LEN - 1] + "…"
-    return Message(text, s.notify)
+        foot.append(f"🌡️ Agua {round(s.sst)} °C → {wetsuit(s.sst, config)}")
+    if starred:
+        foot.append(f"<i>{LEGEND}</i>")
+    foot.append(f"<i>{ATTRIBUTION}</i>")
+
+    parts: list[list[str]] = [head]
+    for block in blocks:
+        if len("\n".join(parts[-1] + block + foot)) > MAX_LEN:
+            parts.append([f"{header} · sigue", ""])
+        parts[-1] += block
+    parts[-1] += foot
+    return [Message("\n".join(p), s.notify and i == 0) for i, p in enumerate(parts)]
 
 
 def build_messages(today: DaySummary, tomorrow: DaySummary | None, config: Config) -> list[Message]:
-    msgs = [day_message("HOY", today, config)]
+    msgs = day_messages("HOY", today, config)
     if tomorrow is not None:
-        msgs.append(day_message("MAÑANA", tomorrow, config))
+        msgs += day_messages("MAÑANA", tomorrow, config)
     return msgs
 
 
 def failure_message(config: Config, day: date) -> Message:
-    text = (f"🏄 <b>{escape(config.general['title'])}</b> · {fmt_date(day)}\n\n"
+    text = (f"🏄🌊 <b>{escape(config.general['title'])}</b> · {fmt_date(day)}\n\n"
             "⚠️ Hoy no he podido obtener la previsión (Open-Meteo no responde).\n"
             "Esto no quiere decir que esté flat: mira Windguru o surf-forecast.\n\n"
             f"<i>{ATTRIBUTION}</i>")
