@@ -73,8 +73,9 @@ def cmd_dry_run(config: Config) -> int:
 def cmd_send(config: Config, force: bool) -> int:
     token = clean_token(os.environ.get("TELEGRAM_BOT_TOKEN"))
     chat_id = (os.environ.get("TELEGRAM_CHAT_ID") or "").strip()
-    if not token or not chat_id:
-        print("Faltan TELEGRAM_BOT_TOKEN o TELEGRAM_CHAT_ID en el entorno.", file=sys.stderr)
+    missing = [name for name, v in (("TELEGRAM_BOT_TOKEN", token), ("TELEGRAM_CHAT_ID", chat_id)) if not v]
+    if missing:
+        print(f"Falta o está vacío en el entorno: {', '.join(missing)}.", file=sys.stderr)
         return 2
     state_path = DATA / "state.json"
     state = load_state(state_path)
