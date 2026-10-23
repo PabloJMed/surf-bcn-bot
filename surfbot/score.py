@@ -21,7 +21,7 @@ EMOJI = {GREEN: "🟢", YELLOW: "🟡", RED: "🔴", FLAT: "⚪", DANGER: "⛔"}
 LABEL = {GREEN: "MERECE LA PENA", YELLOW: "JUSTITO", RED: "NO MERECE LA PENA",
          FLAT: "FLAT", DANGER: "PELIGROSO"}
 
-OFFSHORE, CROSS, ONSHORE = "terral", "cruzado", "de mar"
+OFFSHORE, CROSS, ONSHORE, CALM = "terral", "cruzado", "de mar", "calma"
 
 
 # --- Utilidades ---------------------------------------------------------------
@@ -79,9 +79,11 @@ def heff(wave_height: float, wave_dir: float, spot: Spot) -> float:
     return wave_height * dir_factor(wave_dir, spot.facing) * spot.exposure
 
 
-def wind_kind(wind_dir: float, spot: Spot, rules: dict) -> str:
-    rel = angle_diff(wind_dir, (spot.facing + 180) % 360)
+def wind_kind(wind_dir: float, spot: Spot, rules: dict, speed: float | None = None) -> str:
     w = rules["wind"]
+    if speed is not None and speed <= w["calm_max"]:
+        return CALM
+    rel = angle_diff(wind_dir, (spot.facing + 180) % 360)
     if rel <= w["offshore_max_rel"]:
         return OFFSHORE
     if rel <= w["cross_max_rel"]:
@@ -90,6 +92,8 @@ def wind_kind(wind_dir: float, spot: Spot, rules: dict) -> str:
 
 
 def wind_adjust(kind: str, speed: float, rules: dict) -> float:
+    if kind == CALM:
+        return float(rules["wind"]["calm_adjust"])
     table = rules["wind"][{OFFSHORE: "offshore", CROSS: "cross", ONSHORE: "onshore"}[kind]]
     for limit, adj in table:
         if speed <= limit:
@@ -154,7 +158,7 @@ def is_doubtful(score: float, rules: dict) -> bool:
 def _score_level(c: Conditions, spot: Spot, level: Level, rules: dict) -> HourScore:
     """Vetos y puntuación de un nivel, sin la pinza B (que depende de los otros niveles)."""
     h = heff(c.wave_height, c.wave_direction, spot)
-    kind = wind_kind(c.wind_direction, spot, rules)
+    kind = wind_kind(c.wind_direction, spot, rules, c.wind_speed)
     common = dict(level=level.id, heff=h, period=c.period, wind_kind=kind,
                   t_estimated=c.t_estimated)
 
@@ -199,7 +203,8 @@ def _score_level(c: Conditions, spot: Spot, level: Level, rules: dict) -> HourSc
         notify = min(notify, rules["short_period_cap"])
 
     # Motivo: lo que más ha limitado la puntuación.
-    if adj <= -3:
+    if adj < 0:
+        # Cualquier viento que reste es lo que hay que contar: con olas pequeñas decide el color.
         what = {OFFSHORE: "terral fuerte", CROSS: "viento cruzado", ONSHORE: "viento de mar"}[kind]
         reason = f"{what} {round(c.wind_speed)} km/h"
     elif small:
@@ -342,7 +347,8 @@ def day_verdict(series: list[tuple[Hour, HourScore]], spot_id: str, level_id: st
     dv.wave_direction = circular_mean(h.wave_direction for h in hours)
     dv.wind_speed = mean(h.wind_speed for h in hours)
     dv.wind_direction = circular_mean(h.wind_direction for h in hours)
-    dv.wind_kind = scores[chosen[len(chosen) // 2]].wind_kind
+    dv.wind_kind = (CALM if round(dv.wind_speed) <= rules["wind"]["calm_max"]
+                    else scores[chosen[len(chosen) // 2]].wind_kind)
     dv.board = board_for(level_id, dv.heff, dv.period, config)
     dv.timeline = [(h.time.hour, s.verdict, s.reason) for h, s in series]
     return dv
@@ -376,16 +382,18 @@ class DaySummary:
         return self.headline.good
 
 
-def _rank_key(dv: DayVerdict):
+def rank_key(dv: DayVerdict):
+    """Mejor color primero; a igual color, una franja de varias horas antes que una hora
+    suelta; luego la puntuación y la duración."""
     w = (dv.window[1] - dv.window[0]) if dv.window else 0
-    return (RANK[dv.verdict], dv.score, w)
+    return (RANK[dv.verdict], not dv.single_hour, dv.score, w)
 
 
 def best_for_level(verdicts: dict[str, dict[str, DayVerdict]], config: Config,
                    level_id: str) -> DayVerdict | None:
     cands = [verdicts[s.id][level_id] for s in config.spots
              if s.allows(level_id) and s.id in verdicts]
-    return max(cands, key=_rank_key) if cands else None
+    return max(cands, key=rank_key) if cands else None
 
 
 def is_cleanup_day(sf: SpotForecast, spot: Spot, dv: DayVerdict, config: Config) -> bool:

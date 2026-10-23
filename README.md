@@ -48,7 +48,9 @@ Un día malo es una sola línea: `🔴 NO MERECE LA PENA · viento de mar 25 km/
 - El titular es la mejor playa para el nivel más bajo que tiene día; debajo, **una línea por nivel**,
   siempre con playa, franja y tabla sugerida.
 - **Otras playas para intentarlo**: solo las que no están en rojo y tienen al menos 2 horas
-  seguidas aprovechables, para el mismo nivel que el titular. Las demás no se mencionan.
+  seguidas aprovechables, para el mismo nivel que el titular, cada una con su detalle (franja,
+  tira horaria, ola, viento y qué la estropea). Las demás no se mencionan. A igual color, una
+  franja de varias horas va siempre por delante de una hora suelta.
 - **Webcams**: solo de las playas recomendadas ese día (también las dudosas). Son páginas de
   surf-forecast o Windfinder que reúnen las cámaras cercanas y enseñan la hora de cada imagen.
 - El aviso de cada mensaje **suena** si ese día algún nivel tiene al menos 2 horas seguidas de día
@@ -66,7 +68,7 @@ Todo es hora a hora, entre el amanecer y el atardecer, y todos los números est�
    ⚪ flat → 🔴 periodo de pico demasiado corto → 🔴 viento de mar fuerte.
 3. **Puntuación 0–10**: media de una nota de tamaño (curva propia de cada nivel) y una de periodo,
    acotada para que una ola grande de periodo corto no puntúe alto. Se ajusta por viento
-   (terral flojo +1, de mar −1 a −5, cruzado 0 a −4) y +0,5 si domina el mar de fondo de verdad
+   (calma de 5 km/h o menos +1 venga de donde venga, terral flojo +1, de mar −1 a −5, cruzado 0 a −4) y +0,5 si domina el mar de fondo de verdad
    (≥ 7 s de periodo; el mar de viento no cuenta).
 4. **Veredicto**: ≥ 6,5 🟢 · 4,5–6,5 🟡 · < 4,5 🔴. A menos de 0,5 de un umbral: 🤔 dudoso.
    Con menos de 5 s de periodo de pico, como mucho 🟡: por buen viento que haga, una ola tan

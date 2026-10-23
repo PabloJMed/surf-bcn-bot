@@ -121,14 +121,18 @@ class TestMessage(unittest.TestCase):
         s = summary(GOOD)
         h = s.headline
         msg = text(s)
-        section = msg.split("Otras playas para intentarlo")[1].split("\n\n")[0] if "Otras playas" in msg else ""
+        section = ""
+        if "Otras playas para intentarlo" in msg:
+            section = msg.split("Otras playas para intentarlo")[1].split("📷")[0].split("🌡️")[0]
         for sp in CFG.spots:
             if sp.id == h.spot_id or not sp.allows(h.level):
                 continue
             dv = s.verdicts[sp.id][h.level]
-            shown = f" {sp.short}, " in section
+            shown = f"<b>{sp.short}</b>" in section
             self.assertEqual(shown, dv.good and not dv.single_hour, sp.id)
-        self.assertNotIn("🔴", section)
+        # Cada playa listada trae su detalle: tira horaria y ola/viento.
+        self.assertEqual(section.count("📍"), section.count("<code>") // 2)
+        self.assertEqual(section.count("📍"), section.count("🌊"))
 
     def test_failure_message(self):
         msg = failure_message(CFG, date(2026, 10, 23))

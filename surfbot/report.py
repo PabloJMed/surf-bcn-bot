@@ -7,7 +7,7 @@ from datetime import date
 from html import escape
 
 from .config import Config
-from .score import (CROSS, EMOJI, GREEN, OFFSHORE, ONSHORE, RANK, LABEL, DaySummary,
+from .score import (CALM, CROSS, EMOJI, GREEN, OFFSHORE, ONSHORE, RANK, LABEL, DaySummary, rank_key,
                     DayVerdict, compass, fmt_num, wetsuit)
 
 MAX_LEN = 4096
@@ -15,7 +15,8 @@ DAYS = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"]
 MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
 ATTRIBUTION = "Datos: Open-Meteo.com (CC BY 4.0)"
 LEGEND = "🟢 merece la pena · 🟡 justito · 🔴 no merece la pena · 🤔 dudoso"
-WIND_HINT = {OFFSHORE: "terral (de tierra, ordena la ola)",
+WIND_HINT = {CALM: "en calma (mar liso)",
+             OFFSHORE: "terral (de tierra, ordena la ola)",
              CROSS: "cruzado",
              ONSHORE: "de mar (revuelve el agua)"}
 
@@ -41,6 +42,15 @@ def timeline_strip(dv: DayVerdict) -> str:
     first, last = dv.timeline[0][0], dv.timeline[-1][0]
     dots = "".join(EMOJI[v] for _, v, _ in dv.timeline)
     return f"<code>{first:>2}h</code> {dots} <code>{last + 1}h</code>"
+
+
+def wind_text(dv: DayVerdict, long: bool = False) -> str:
+    kind = WIND_HINT.get(dv.wind_kind, dv.wind_kind) if long else dv.wind_kind
+    if dv.wind_kind == CALM:
+        return f"💨 {'Viento ' if long else ''}{kind}, {round(dv.wind_speed)} km/h"
+    if long:
+        return f"💨 Viento {kind} del {compass(dv.wind_direction)}, {round(dv.wind_speed)} km/h"
+    return f"💨 {kind} {compass(dv.wind_direction)} {round(dv.wind_speed)} km/h"
 
 
 def outside_window(dv: DayVerdict) -> list[str]:
@@ -80,7 +90,7 @@ def level_line(dv: DayVerdict, config: Config) -> str:
     return f"{head} " + " · ".join(parts) + (" 🤔" if dv.doubtful else "")
 
 
-def other_spots(s: DaySummary, config: Config) -> list[str]:
+def other_spots(s: DaySummary, config: Config) -> list[DayVerdict]:
     """Las demás playas aptas para el nivel del titular que merecen un intento:
     no rojas y con una franja seguida de al menos window_min_hours horas."""
     h = s.headline
@@ -91,9 +101,19 @@ def other_spots(s: DaySummary, config: Config) -> list[str]:
         dv = s.verdicts[sp.id][h.level]
         if dv.good and dv.window and not dv.single_hour:
             found.append(dv)
-    found.sort(key=lambda dv: (-RANK[dv.verdict], -dv.score))
-    return [f"• {EMOJI[dv.verdict]} {escape(config.spot(dv.spot_id).short)}, {hours_text(dv)}"
-            + (" 🤔" if dv.doubtful else "") for dv in found]
+    return sorted(found, key=rank_key, reverse=True)
+
+
+def spot_detail(dv: DayVerdict, config: Config) -> list[str]:
+    """Detalle compacto de una playa: franja, tira horaria, ola, viento y qué la estropea."""
+    t = fmt_num(dv.period) + (" s*" if dv.t_estimated else " s")
+    lines = [
+        f"📍 <b>{escape(config.spot(dv.spot_id).short)}</b> · {EMOJI[dv.verdict]} "
+        f"{LABEL[dv.verdict].lower()}, de {dv.window[0]} a {dv.window[1]} h" + (" 🤔" if dv.doubtful else ""),
+        timeline_strip(dv),
+        f"🌊 {fmt_num(dv.heff)} m · {t} · del {compass(dv.wave_direction)} · " + wind_text(dv),
+    ]
+    return lines + outside_window(dv)
 
 
 def webcams(s: DaySummary, config: Config) -> str:
@@ -121,8 +141,7 @@ def day_body(s: DaySummary, config: Config) -> list[str]:
         + (f" ({level.label.lower()})" if h.level != config.levels[0].id else ""),
         timeline_strip(h),
         f"🌊 Olas de {fmt_num(h.heff)} m · periodo {t} · entran del {compass(h.wave_direction)}",
-        f"💨 Viento {WIND_HINT.get(h.wind_kind, h.wind_kind)} del {compass(h.wind_direction)}, "
-        f"{round(h.wind_speed)} km/h",
+        wind_text(h, long=True),
     ]
     lines += outside_window(h)
     if h.doubtful:
@@ -138,7 +157,9 @@ def day_body(s: DaySummary, config: Config) -> list[str]:
     lines += [level_line(s.best[lv.id], config) for lv in config.levels if lv.id in s.best]
     others = other_spots(s, config)
     if others:
-        lines += ["", f"<b>Otras playas para intentarlo</b> ({level.label.lower()})"] + others
+        lines += ["", f"<b>Otras playas para intentarlo</b> ({level.label.lower()})"]
+        for dv in others:
+            lines += [""] + spot_detail(dv, config)
     cams = webcams(s, config)
     if cams:
         lines += ["", cams]

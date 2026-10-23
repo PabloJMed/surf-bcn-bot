@@ -49,6 +49,10 @@ notify_min = 5.5              # suena si algún nivel tiene ≥ 2 h seguidas con
 period_curve = [[3.8, 0], [4.2, 2.0], [4.6, 4.0], [5.0, 5.5], [5.5, 7.0], [6.0, 8.0], [6.5, 9.0], [7.0, 9.5], [8.0, 10]]
 
 [rules.wind]
+# Con viento de calm_max km/h o menos no hay viento real: mar liso, lo mejor que puede pasar.
+# Cuenta como calma (+calm_adjust) venga de donde venga.
+calm_max = 5
+calm_adjust = 1.0
 # rel = ángulo entre el origen del viento y el terral del spot (facing + 180)
 offshore_max_rel = 60
 cross_max_rel = 120

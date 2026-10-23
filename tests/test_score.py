@@ -5,8 +5,8 @@ from datetime import date, datetime, timedelta
 from surfbot.config import load_config
 from surfbot.fetch import Hour, SpotForecast
 from surfbot.score import (
-    DANGER, FLAT, GREEN, RANK, RED, YELLOW, Conditions, angle_diff, board_for,
-    danger_ceiling, day_verdict, dir_factor, interp, score_hour, summarize_day,
+    DANGER, FLAT, GREEN, RANK, RED, YELLOW, Conditions, DayVerdict, angle_diff, board_for,
+    danger_ceiling, day_verdict, dir_factor, interp, rank_key, score_hour, summarize_day,
 )
 
 CFG = load_config()
@@ -181,6 +181,20 @@ class TestShortPeriodAndSwell(unittest.TestCase):
         self.assertAlmostEqual(score(9.0), base + CFG.rules["swell_bonus"])
 
 
+class TestCalm(unittest.TestCase):
+    def test_calm_wind_counts_the_same_from_any_direction(self):
+        for lv in LEVELS:
+            scores = {hour(0.6, 6, wd, 3)[lv].display for wd in (0, 90, 135, 180, 270, TERRAL)}
+            self.assertEqual(len(scores), 1, lv)
+        self.assertEqual(hour(0.6, 6, MAR, 3)["principiante"].wind_kind, "calma")
+
+    def test_calm_is_like_a_light_offshore(self):
+        self.assertEqual(hour(0.6, 6, MAR, 5)["principiante"].display,
+                         hour(0.6, 6, TERRAL, 8)["principiante"].display)
+        self.assertLess(hour(0.6, 6, MAR, 6)["principiante"].display,
+                        hour(0.6, 6, MAR, 5)["principiante"].display)
+
+
 class TestCumulativeInvariants(unittest.TestCase):
     def test_thresholds_are_monotonic_per_spot(self):
         for spot in CFG.spots:
@@ -280,6 +294,15 @@ class TestDay(unittest.TestCase):
         s = summarize_day(data, CFG, DAY, datetime(2026, 10, 23, 7))
         self.assertEqual(s.best["avanzado"].verdict, YELLOW)
         self.assertFalse(s.notify)
+
+
+class TestRanking(unittest.TestCase):
+    def test_several_hours_beat_a_single_better_hour(self):
+        one = DayVerdict("a", "principiante", DAY, YELLOW, 6.2, window=(12, 13), single_hour=True)
+        three = DayVerdict("b", "principiante", DAY, YELLOW, 4.8, window=(10, 13))
+        self.assertGreater(rank_key(three), rank_key(one))
+        green = DayVerdict("c", "principiante", DAY, GREEN, 7.0, window=(10, 12))
+        self.assertGreater(rank_key(green), rank_key(three))
 
 
 class TestGarraf(unittest.TestCase):
