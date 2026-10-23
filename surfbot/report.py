@@ -137,7 +137,7 @@ def day_body(s: DaySummary, config: Config) -> list[str]:
     t = fmt_num(h.period) + (" s*" if h.t_estimated else " s")
     lines = [
         f"<b>{EMOJI[h.verdict]} {LABEL[h.verdict]}</b>" + (" 🤔" if h.doubtful else ""),
-        f"📍 <b>{escape(spot.short)}</b>, mejor de {h.window[0]} a {h.window[1]} h"
+        f"⭐ <b>Mejor playa: {escape(spot.short)}</b>, de {h.window[0]} a {h.window[1]} h"
         + (f" ({level.label.lower()})" if h.level != config.levels[0].id else ""),
         timeline_strip(h),
         f"🌊 Olas de {fmt_num(h.heff)} m · periodo {t} · entran del {compass(h.wave_direction)}",
@@ -157,7 +157,7 @@ def day_body(s: DaySummary, config: Config) -> list[str]:
     lines += [level_line(s.best[lv.id], config) for lv in config.levels if lv.id in s.best]
     others = other_spots(s, config)
     if others:
-        lines += ["", f"<b>Otras playas para intentarlo</b> ({level.label.lower()})"]
+        lines += ["", f"<b>También se puede intentar</b> ({level.label.lower()})"]
         for dv in others:
             lines += [""] + spot_detail(dv, config)
     cams = webcams(s, config)

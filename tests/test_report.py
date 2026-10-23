@@ -82,7 +82,8 @@ class TestMessage(unittest.TestCase):
         strip = next(l for l in lines if l.startswith("<code>"))
         self.assertEqual(strip.count("🟢"), 5)
         self.assertEqual(strip.count("🔴"), 4)
-        self.assertIn("mejor de 9 a 14 h", "\n".join(lines))
+        self.assertIn("Mejor playa: ", "\n".join(lines))
+        self.assertIn(", de 9 a 14 h", "\n".join(lines))
         after = next(l for l in lines if l.startswith("⏱️ Desde las 14 h"))
         self.assertIn("viento de mar", after)
 
@@ -122,8 +123,8 @@ class TestMessage(unittest.TestCase):
         h = s.headline
         msg = text(s)
         section = ""
-        if "Otras playas para intentarlo" in msg:
-            section = msg.split("Otras playas para intentarlo")[1].split("📷")[0].split("🌡️")[0]
+        if "También se puede intentar" in msg:
+            section = msg.split("También se puede intentar")[1].split("📷")[0].split("🌡️")[0]
         for sp in CFG.spots:
             if sp.id == h.spot_id or not sp.allows(h.level):
                 continue

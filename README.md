@@ -17,7 +17,7 @@ Cada mañana llegan **dos mensajes**: uno para hoy y otro para mañana, cada uno
 🏄 Surf BCN → Sitges · MAÑANA sáb 24 oct
 
 🟢 MERECE LA PENA 🤔
-📍 Barceloneta, mejor de 8 a 15 h
+⭐ Mejor playa: Barceloneta, de 8 a 15 h
  8h 🟡🟢🟢🟢🟢🟢🟡🔴🔴🔴🔴 19h
 🌊 Olas de 0,6 m · periodo 4,5 s · entran del E
 💨 Viento terral (de tierra, ordena la ola) del O, 7 km/h
@@ -29,7 +29,7 @@ Por nivel
 • Intermedio: 🟡 Ginesta, 9–13 h · pequeño, mejor longboard
 • Avanzado: 🟡 Ginesta, 9–13 h · pequeño, mejor longboard
 
-Otras playas para intentarlo (principiante)
+También se puede intentar (principiante)
 • 🟡 Bogatell, 8–15 h 🤔
 • 🟡 Castelldefels, 9–13 h
 
@@ -42,12 +42,12 @@ Datos: Open-Meteo.com (CC BY 4.0)
 
 Un día malo es una sola línea: `🔴 NO MERECE LA PENA · viento de mar 25 km/h: revuelto`.
 
-- **La franja** ("mejor de 8 a 15 h") es el tramo seguido más largo de horas de luz que son al
+- **⭐ Mejor playa** es la recomendación del día. **La franja** ("de 8 a 15 h") es el tramo seguido más largo de horas de luz que son al
   menos 🟡 en esa playa. La **tira de bolas** es cada hora de luz de esa playa, de izquierda a
   derecha, y las líneas ⏱️ dicen qué estropea el mar justo antes y justo después de la franja.
 - El titular es la mejor playa para el nivel más bajo que tiene día; debajo, **una línea por nivel**,
   siempre con playa, franja y tabla sugerida.
-- **Otras playas para intentarlo**: solo las que no están en rojo y tienen al menos 2 horas
+- **También se puede intentar**: el resto de playas, solo las que no están en rojo y tienen al menos 2 horas
   seguidas aprovechables, para el mismo nivel que el titular, cada una con su detalle (franja,
   tira horaria, ola, viento y qué la estropea). Las demás no se mencionan. A igual color, una
   franja de varias horas va siempre por delante de una hora suelta.
