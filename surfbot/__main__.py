@@ -59,8 +59,7 @@ def compose(config: Config, now: datetime) -> tuple[Message, list | None]:
         print(f"Error al descargar la previsión: {e}", file=sys.stderr)
         return failure_message(config, now.date()), None
     s_today, s_tomorrow = summaries(data, config, now)
-    cells = {sid: sf.marine_cell for sid, sf in data.items()}
-    return build_message(s_today, s_tomorrow, config, cells), [s_today, s_tomorrow]
+    return build_message(s_today, s_tomorrow, config), [s_today, s_tomorrow]
 
 
 def cmd_dry_run(config: Config) -> int:

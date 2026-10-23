@@ -9,7 +9,7 @@ Por cada hora, spot y nivel se calculan dos puntuaciones:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 
 from .config import Config, Level, Spot
@@ -258,6 +258,7 @@ class DayVerdict:
     wind_speed: float = 0.0
     wind_direction: float = 0.0
     wind_kind: str = ""
+    timeline: list[tuple[int, str, str]] = field(default_factory=list)  # (hora, veredicto, motivo)
 
     @property
     def good(self) -> bool:
@@ -336,6 +337,7 @@ def day_verdict(series: list[tuple[Hour, HourScore]], spot_id: str, level_id: st
     dv.wind_direction = circular_mean(h.wind_direction for h in hours)
     dv.wind_kind = scores[chosen[len(chosen) // 2]].wind_kind
     dv.board = board_for(level_id, dv.heff, dv.period, config)
+    dv.timeline = [(h.time.hour, s.verdict, s.reason) for h, s in series]
     return dv
 
 

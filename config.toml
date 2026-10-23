@@ -108,7 +108,7 @@ cuts = [[4.5, "longboard"], [7.5, "funboard-mini"], [14.0, "shortboard"], [999, 
 
 [alerts]
 rain_mm_48h = 15
-rain_spots = ["barceloneta", "bogatell"]
+rain_spots = ["barceloneta", "bogatell", "prat"]
 cleanup_onshore_mean = 15     # km/h de media de mar en las 24 h previas
 cleanup_calm_max = 10         # hoy terral, o viento ≤ esto
 # [temperatura mínima °C, neopreno]
@@ -128,7 +128,7 @@ facing = 135
 exposure = 1.0
 levels = ["principiante", "intermedio", "avanzado"]
 note = "Fondo que cae rápido: shorebreak. Mucha gente."
-webcam_url = ""
+webcam_url = "https://www.surf-forecast.com/breaks/Barceloneta/webcams/latest"
 
 [spots.bogatell]
 name = "Bogatell / Nova Mar Bella"
@@ -139,7 +139,18 @@ facing = 140
 exposure = 1.0
 levels = ["principiante", "intermedio", "avanzado"]
 note = "El spot más surfeado de BCN. Corrientes junto a los espigones."
-webcam_url = ""
+webcam_url = "https://www.surf-forecast.com/breaks/Bogatell/webcams/latest"
+
+[spots.prat]
+name = "Platja del Prat"
+short = "El Prat"
+marine = [41.280, 2.100]
+wind = [41.287, 2.090]
+facing = 160                  # costa orientada al SSE entre el Llobregat y Gavà; calibrable
+exposure = 1.0
+levels = ["principiante", "intermedio", "avanzado"]
+note = "Playa larga y abierta junto al aeropuerto. Tras lluvias, cerca de la desembocadura del Llobregat."
+webcam_url = ""               # no hay webcam de playa conocida
 
 [spots.castelldefels]
 name = "Castelldefels"
@@ -150,7 +161,7 @@ facing = 150
 exposure = 1.0
 levels = ["principiante", "intermedio", "avanzado"]
 note = "Playa larga y tendida, ideal para empezar. Necesita swell de E–S."
-webcam_url = ""
+webcam_url = "https://www.windfinder.com/webcams/castelldefels"
 
 [spots.castelldefels.overrides.principiante]
 heff_danger = 0.95            # shorebreak con tamaño
@@ -164,7 +175,7 @@ facing = 155
 exposure = 1.0
 levels = ["principiante", "intermedio", "avanzado"]
 note = "Junto al puerto. Rip junto al espigón."
-webcam_url = ""
+webcam_url = "https://www.surf-forecast.com/breaks/Port-Ginesta-Castelldefels/webcams/latest"
 
 [spots.ginesta.overrides.principiante]
 heff_danger = 0.60            # rip del espigón
@@ -178,7 +189,7 @@ facing = 165
 exposure = 1.0
 levels = ["intermedio", "avanzado"]   # rocas y corrientes: nunca principiante
 note = "Rocas y corrientes."
-webcam_url = ""
+webcam_url = "https://www.surf-forecast.com/breaks/Garraf/webcams/latest"
 
 [spots.garraf.overrides.intermedio]
 heff_danger = 1.50
@@ -195,4 +206,4 @@ facing = 160
 exposure = 1.0
 levels = ["principiante", "intermedio", "avanzado"]
 note = "Fondo tendido, de lo mejor para principiantes."
-webcam_url = ""
+webcam_url = "https://www.windfinder.com/webcams/sitges"

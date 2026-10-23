@@ -14,22 +14,39 @@ Python ≥ 3.11, solo librería estándar. Se ejecuta en GitHub Actions.
 ```
 🏄 Surf BCN → Sitges · sáb 24 oct
 
-HOY: 🟢 Castelldefels · 9–12 h
-   0,8 m · 7 s · del ESE · terral N 8 km/h
-   🟢 Principiante · softboard
-   🟢 Intermedio · funboard-mini
-   🟡 Avanzado · flojo → longboard
-   🧹 Día de limpieza tras el viento de mar de ayer
-Sitges 🟡 (0,5 m, 6 s) · Barceloneta 🔴 viento de mar 22 km/h
+HOY · 🟢 MERECE LA PENA 🤔
+📍 Barceloneta, mejor de 8 a 15 h
+ 8h 🟡🟢🟢🟢🟢🟢🟡🔴🔴🔴🔴 19h
+🌊 Olas de 0,6 m · periodo 4,5 s · entran del E
+💨 Viento terral (de tierra, ordena la ola) del O, 7 km/h
+⏱️ Desde las 15 h: viento de mar 9 km/h
+🤔 Al límite: mira la webcam antes de ir
 
-MAÑANA: ⚪ FLAT · flat (0,2 m)
+Por nivel
+• Principiante: 🟢 Barceloneta, 8–15 h · softboard 🤔
+• Intermedio: 🟡 Ginesta, 9–13 h · pequeño, mejor longboard
+• Avanzado: 🟡 Ginesta, 9–13 h · pequeño, mejor longboard
 
-🌡️ Agua 19 °C → 3/2
+Otras playas (principiante): 🟡 Bogatell, El Prat, Castelldefels, Ginesta · 🔴 Sitges
+📷 Webcams: Barceloneta · Ginesta
+
+━━━━━━━━━━
+
+MAÑANA · 🔴 NO MERECE LA PENA · viento de mar 25 km/h: revuelto
+
+🌡️ Agua 23 °C → shorty o 3/2
+🟢 merece la pena · 🟡 justito · 🔴 no merece la pena · 🤔 dudoso
 Datos: Open-Meteo.com (CC BY 4.0)
 ```
 
-- El titular es el mejor día del nivel más bajo que lo alcanza; debajo, una línea por nivel con
-  su veredicto y la tabla sugerida.
+- **La franja** ("mejor de 8 a 15 h") es el tramo seguido más largo de horas de luz que son al
+  menos 🟡 en esa playa. La **tira de bolas** es cada hora de luz de esa playa, de izquierda a
+  derecha, y las líneas ⏱️ dicen qué estropea el mar justo antes y justo después de la franja.
+- El titular es la mejor playa para el nivel más bajo que tiene día; debajo, **una línea por nivel**,
+  siempre con playa, franja y tabla sugerida.
+- **Otras playas** agrupa el resto por color, para el mismo nivel que el titular.
+- **Webcams**: solo de las playas recomendadas ese día (también las dudosas). Son páginas de
+  surf-forecast o Windfinder que reúnen las cámaras cercanas y enseñan la hora de cada imagen.
 - Los días malos ocupan **una sola línea**.
 - El aviso **suena** si algún nivel tiene al menos 2 horas seguidas de día bueno de verdad. Si no,
   llega en silencio. Siempre llega algo: si Open-Meteo falla, recibes "⚠️ Hoy no he podido obtener
@@ -84,6 +101,7 @@ shortboard; avanzado longboard < 4,5 ≤ funboard-mini < 7,5 ≤ shortboard < 14
 |---|---|---|---|
 | Barceloneta / Sant Sebastià | 135° | todos | Shorebreak. Mucha gente. |
 | Bogatell / Nova Mar Bella | 140° | todos | Corrientes junto a los espigones. |
+| Platja del Prat | 160° | todos | Larga y abierta. Tras lluvias, cerca del Llobregat. Sin webcam. |
 | Castelldefels | 150° | todos | Techo de principiante 0,95 m por el shorebreak. |
 | Port Ginesta | 155° | todos | Techo de principiante 0,60 m por el rip del espigón. |
 | Garraf | 165° | intermedio, avanzado | Rocas y corrientes. Nunca se recomienda a principiante. |
@@ -93,7 +111,7 @@ shortboard; avanzado longboard < 4,5 ≤ funboard-mini < 7,5 ≤ shortboard < 14
 
 - 🧹 **Día de limpieza**: en las 24 h previas el oleaje fue igual o mayor y sopló viento de mar de
   más de 15 km/h de media, y hoy hay terral o calma. Suelen ser los mejores días del Mediterráneo.
-- 💩 **Calidad del agua**: ≥ 15 mm de lluvia en 48 h en Barcelona. Los colectores desbordan al mar:
+- 💩 **Calidad del agua**: ≥ 15 mm de lluvia en 48 h en Barcelona o El Prat. Los colectores desbordan al mar:
   evita el baño 48 h y aléjate del Llobregat y el Besòs.
 - 🌡️ **Neopreno** según la temperatura del agua.
 
@@ -116,7 +134,7 @@ shortboard; avanzado longboard < 4,5 ≤ funboard-mini < 7,5 ≤ shortboard < 14
 - **Endurecer un spot para un nivel**: `[spots.<id>.overrides.<nivel>]`.
 - **Umbrales de cada nivel**: `[levels.*]`. Mantén la regla de oro: los techos nunca bajan al subir
   de nivel, y `flat_threshold` y `t_peak_min` nunca suben. Los tests fallan si la rompes.
-- **Webcam**: rellena `webcam_url` y aparecerá un enlace cuando ese spot sea el recomendado.
+- **Webcam**: `webcam_url` de cada spot; el enlace sale solo cuando ese spot se recomienda.
 
 Para depurar, `--explain` enseña cada hora con las dos notas y el motivo:
 
