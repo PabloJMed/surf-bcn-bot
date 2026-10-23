@@ -24,9 +24,22 @@ MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", 
 ATTRIBUTION = "Datos: Open-Meteo.com (CC BY 4.0)"
 NIGHT = "🌙"
 NO_STAR = "☆"
-LEGEND = ("⭐ se puede intentar · ⭐⭐ o más, buenas condiciones · ⭐⭐⭐⭐⭐ día idílico · "
-          "☆ no recomendable\n"
-          "Horas: 🟢 buenas · 🟡 justas · 🔴 malas · ⚪ sin olas · ⛔ peligro · 🌙 de noche")
+# Va al final de cada mensaje en un bloque plegable: se despliega tocándolo.
+LEGEND = "\n".join([
+    "<b>¿Qué significan las estrellas?</b>",
+    "☆ No recomendable: no hay ni 2 horas seguidas aprovechables",
+    "⭐ Se puede intentar: olas justas, para practicar",
+    "⭐⭐ Buenas condiciones",
+    "⭐⭐⭐ Muy buenas",
+    "⭐⭐⭐⭐ Excelentes",
+    "⭐⭐⭐⭐⭐ Día idílico en Barcelona",
+    "",
+    "Se puntúa la mejor franja del día (al menos 2 h seguidas) según el tamaño y el periodo "
+    "de la ola, el viento y el nivel. Junto a la playa se indica para qué nivel es, si no "
+    "vale para todos.",
+    "",
+    "<b>Horas</b>: 🟢 buenas · 🟡 justas · 🔴 malas · ⚪ sin olas · ⛔ peligro · 🌙 de noche",
+])
 WIND_HINT = {CALM: "calma", OFFSHORE: "terral", CROSS: "cruzado", ONSHORE: "de mar"}
 
 
@@ -191,7 +204,7 @@ def day_messages(title: str, s: DaySummary, config: Config) -> list[Message]:
     if s.sst is not None:
         foot.append(f"🌡️ Agua {round(s.sst)} °C → {wetsuit(s.sst, config)}")
     if starred:
-        foot.append(f"<i>{LEGEND}</i>")
+        foot.append(f"<blockquote expandable>{LEGEND}</blockquote>")
     foot.append(f"<i>{ATTRIBUTION}</i>")
 
     parts: list[list[str]] = [head]

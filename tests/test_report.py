@@ -169,9 +169,15 @@ class TestMessages(unittest.TestCase):
             self.assertNotIn("api.telegram.org", msg.text)
             self.assertLessEqual(len(msg.text), MAX_LEN)
 
-    def test_legend_only_when_there_is_something(self):
-        self.assertIn("se puede intentar", text(summary(GOOD)))
-        self.assertNotIn("se puede intentar", text(summary(FLAT)))
+    def test_star_legend_at_the_end(self):
+        msg = text(summary(GOOD))
+        legend = msg.split("<blockquote expandable>")[1]
+        self.assertTrue(legend.startswith("<b>¿Qué significan las estrellas?</b>"))
+        for n in range(1, 6):
+            self.assertIn("⭐" * n + " ", legend)
+        self.assertIn("☆ No recomendable", legend)
+        self.assertLess(msg.index("<blockquote"), msg.index("Datos: Open-Meteo"))
+        self.assertNotIn("<blockquote", text(summary(FLAT)))   # sin estrellas no hace falta
 
     def test_failure_message(self):
         msg = failure_message(CFG, date(2026, 10, 23))

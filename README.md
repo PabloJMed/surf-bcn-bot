@@ -45,6 +45,8 @@ Resumen · mejor franja de cada playa
   por hora de 7 a 19 h (🌙 = de noche), siempre con la misma escala, y debajo las horas agrupadas
   por color con el motivo de las malas. Luego ola, viento, estrellas y tabla por nivel y la webcam.
 - **Ninguna playa con ⭐**: un mensaje corto que lo dice y por qué, sin desglose.
+- **Al final**, un bloque plegable explica qué significa cada número de estrellas y los colores
+  de las horas (se despliega tocándolo).
 - Si un día no cabe en un mensaje de Telegram, el desglose sigue en otro, sin cortar a mitad de playa.
 - El aviso de cada día **suena** si algún nivel tiene al menos 2 horas seguidas de día bueno de
   verdad; si no, llega en silencio. Siempre llega algo: si Open-Meteo falla, recibes
