@@ -17,7 +17,7 @@ from zoneinfo import ZoneInfo
 
 from .config import DEFAULT_CONFIG, ROOT, Config, load_config
 from .fetch import FetchError, SpotForecast, fetch
-from .report import Message, build_message, failure_message
+from .report import Message, build_messages, failure_message
 from .score import (EMOJI, Conditions, compass, daylight_hours, fmt_num, score_hour,
                     summarize_day)
 from .state import history_rows, load_state, save_state, should_send, write_history
@@ -51,21 +51,26 @@ def summaries(data: dict[str, SpotForecast], config: Config, now: datetime):
     return s_today, s_tomorrow
 
 
-def compose(config: Config, now: datetime) -> tuple[Message, list | None]:
-    """Mensaje y, si hubo datos, los resúmenes del día (para el histórico)."""
+def compose(config: Config, now: datetime) -> tuple[list[Message], list | None]:
+    """Un mensaje por día (hoy y mañana) y, si hubo datos, los resúmenes para el histórico."""
     try:
         data = fetch(config)
     except FetchError as e:
         print(f"Error al descargar la previsión: {e}", file=sys.stderr)
-        return failure_message(config, now.date()), None
+        return [failure_message(config, now.date())], None
     s_today, s_tomorrow = summaries(data, config, now)
-    return build_message(s_today, s_tomorrow, config), [s_today, s_tomorrow]
+    return build_messages(s_today, s_tomorrow, config), [s_today, s_tomorrow]
+
+
+def sound(msg: Message) -> str:
+    return "con sonido" if msg.notify else "sin sonido"
 
 
 def cmd_dry_run(config: Config) -> int:
-    msg, _ = compose(config, now_local(config))
-    print(msg.text)
-    print(f"\n--- {len(msg.text)} caracteres · aviso {'con sonido' if msg.notify else 'sin sonido'} ---")
+    msgs, _ = compose(config, now_local(config))
+    for i, msg in enumerate(msgs, 1):
+        print(f"=== Mensaje {i} de {len(msgs)} · {len(msg.text)} caracteres · {sound(msg)} ===")
+        print(msg.text + "\n")
     return 0
 
 
@@ -84,18 +89,25 @@ def cmd_send(config: Config, force: bool) -> int:
         print(f"No se envía: {why}.")
         return 0
     now = now_local(config)
-    msg, sums = compose(config, now)
-    try:
-        send_message(token, chat_id, msg.text, silent=not msg.notify)
-    except TelegramError as e:
-        print(f"No se pudo enviar: {e}", file=sys.stderr)
-        return 1
+    msgs, sums = compose(config, now)
     today = now.date().isoformat()
-    save_state(state_path, {"last_sent": today})
-    if sums:
+    sent = 0
+    for msg in msgs:
+        try:
+            send_message(token, chat_id, msg.text, silent=not msg.notify)
+        except TelegramError as e:
+            print(f"No se pudo enviar el mensaje {sent + 1}: {e}", file=sys.stderr)
+            break
+        sent += 1
+        if sent == 1:
+            # En cuanto sale el primero, el día cuenta como enviado: así un reintento
+            # del cron no lo repite.
+            save_state(state_path, {"last_sent": today})
+    if sent and sums:
         write_history(DATA / "history.csv", history_rows(today, sums, config))
-    print(f"Enviado ({why}, aviso {'con sonido' if msg.notify else 'sin sonido'}).")
-    return 0
+    if sent:
+        print(f"Enviados {sent} de {len(msgs)} ({why}; " + ", ".join(sound(m) for m in msgs[:sent]) + ").")
+    return 0 if sent == len(msgs) else 1
 
 
 def cmd_get_chat_id() -> int:

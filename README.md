@@ -9,12 +9,14 @@ viento revuelto, periodo de 4 s o temporal.
 
 Python ≥ 3.11, solo librería estándar. Se ejecuta en GitHub Actions.
 
-## El mensaje
+## Los mensajes
+
+Cada mañana llegan **dos mensajes**: uno para hoy y otro para mañana, cada uno con su propio aviso.
 
 ```
-🏄 Surf BCN → Sitges · sáb 24 oct
+🏄 Surf BCN → Sitges · MAÑANA sáb 24 oct
 
-HOY · 🟢 MERECE LA PENA 🤔
+🟢 MERECE LA PENA 🤔
 📍 Barceloneta, mejor de 8 a 15 h
  8h 🟡🟢🟢🟢🟢🟢🟡🔴🔴🔴🔴 19h
 🌊 Olas de 0,6 m · periodo 4,5 s · entran del E
@@ -27,30 +29,31 @@ Por nivel
 • Intermedio: 🟡 Ginesta, 9–13 h · pequeño, mejor longboard
 • Avanzado: 🟡 Ginesta, 9–13 h · pequeño, mejor longboard
 
-Otras playas (principiante): 🟡 Bogatell, El Prat, Castelldefels, Ginesta · 🔴 Sitges
+Otras playas para intentarlo (principiante)
+• 🟡 Bogatell, 8–15 h 🤔
+• 🟡 Castelldefels, 9–13 h
+
 📷 Webcams: Barceloneta · Ginesta
 
-━━━━━━━━━━
-
-MAÑANA · 🔴 NO MERECE LA PENA · viento de mar 25 km/h: revuelto
-
-🌡️ Agua 23 °C → shorty o 3/2
+🌡️ Agua 22 °C → shorty o 3/2
 🟢 merece la pena · 🟡 justito · 🔴 no merece la pena · 🤔 dudoso
 Datos: Open-Meteo.com (CC BY 4.0)
 ```
+
+Un día malo es una sola línea: `🔴 NO MERECE LA PENA · viento de mar 25 km/h: revuelto`.
 
 - **La franja** ("mejor de 8 a 15 h") es el tramo seguido más largo de horas de luz que son al
   menos 🟡 en esa playa. La **tira de bolas** es cada hora de luz de esa playa, de izquierda a
   derecha, y las líneas ⏱️ dicen qué estropea el mar justo antes y justo después de la franja.
 - El titular es la mejor playa para el nivel más bajo que tiene día; debajo, **una línea por nivel**,
   siempre con playa, franja y tabla sugerida.
-- **Otras playas** agrupa el resto por color, para el mismo nivel que el titular.
+- **Otras playas para intentarlo**: solo las que no están en rojo y tienen al menos 2 horas
+  seguidas aprovechables, para el mismo nivel que el titular. Las demás no se mencionan.
 - **Webcams**: solo de las playas recomendadas ese día (también las dudosas). Son páginas de
   surf-forecast o Windfinder que reúnen las cámaras cercanas y enseñan la hora de cada imagen.
-- Los días malos ocupan **una sola línea**.
-- El aviso **suena** si algún nivel tiene al menos 2 horas seguidas de día bueno de verdad. Si no,
-  llega en silencio. Siempre llega algo: si Open-Meteo falla, recibes "⚠️ Hoy no he podido obtener
-  la previsión", para que el silencio nunca se confunda con un día flat.
+- El aviso de cada mensaje **suena** si ese día algún nivel tiene al menos 2 horas seguidas de día
+  bueno de verdad; si no, llega en silencio. Siempre llega algo: si Open-Meteo falla, recibes
+  "⚠️ Hoy no he podido obtener la previsión", para que el silencio nunca se confunda con un día flat.
 
 ## Cómo puntúa
 
@@ -63,8 +66,11 @@ Todo es hora a hora, entre el amanecer y el atardecer, y todos los números est�
    ⚪ flat → 🔴 periodo de pico demasiado corto → 🔴 viento de mar fuerte.
 3. **Puntuación 0–10**: media de una nota de tamaño (curva propia de cada nivel) y una de periodo,
    acotada para que una ola grande de periodo corto no puntúe alto. Se ajusta por viento
-   (terral flojo +1, de mar −1 a −5, cruzado 0 a −4) y +0,5 si domina el mar de fondo.
+   (terral flojo +1, de mar −1 a −5, cruzado 0 a −4) y +0,5 si domina el mar de fondo de verdad
+   (≥ 7 s de periodo; el mar de viento no cuenta).
 4. **Veredicto**: ≥ 6,5 🟢 · 4,5–6,5 🟡 · < 4,5 🔴. A menos de 0,5 de un umbral: 🤔 dudoso.
+   Con menos de 5 s de periodo de pico, como mucho 🟡: por buen viento que haga, una ola tan
+   corta llega floja y rompe toda a la vez.
 5. **Día**: la ventana es la racha más larga de horas ≥ 4,5 y su media da el color. Una ventana de
    una sola hora queda como mucho en 🟡 y no hace sonar el aviso.
 

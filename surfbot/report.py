@@ -80,18 +80,20 @@ def level_line(dv: DayVerdict, config: Config) -> str:
     return f"{head} " + " · ".join(parts) + (" 🤔" if dv.doubtful else "")
 
 
-def other_spots(s: DaySummary, config: Config) -> str:
-    """Las demás playas aptas para el nivel del titular, agrupadas por color."""
+def other_spots(s: DaySummary, config: Config) -> list[str]:
+    """Las demás playas aptas para el nivel del titular que merecen un intento:
+    no rojas y con una franja seguida de al menos window_min_hours horas."""
     h = s.headline
-    groups: dict[str, list[str]] = {}
+    found = []
     for sp in config.spots:
         if sp.id == h.spot_id or not sp.allows(h.level) or sp.id not in s.verdicts:
             continue
-        v = s.verdicts[sp.id][h.level].verdict
-        groups.setdefault(v, []).append(escape(sp.short))
-    parts = [f"{EMOJI[v]} {', '.join(names)}"
-             for v, names in sorted(groups.items(), key=lambda kv: -RANK[kv[0]])]
-    return " · ".join(parts)
+        dv = s.verdicts[sp.id][h.level]
+        if dv.good and dv.window and not dv.single_hour:
+            found.append(dv)
+    found.sort(key=lambda dv: (-RANK[dv.verdict], -dv.score))
+    return [f"• {EMOJI[dv.verdict]} {escape(config.spot(dv.spot_id).short)}, {hours_text(dv)}"
+            + (" 🤔" if dv.doubtful else "") for dv in found]
 
 
 def webcams(s: DaySummary, config: Config) -> str:
@@ -105,17 +107,16 @@ def webcams(s: DaySummary, config: Config) -> str:
     return "📷 Webcams: " + " · ".join(links) if links else ""
 
 
-def day_block(title: str, s: DaySummary, config: Config) -> list[str]:
+def day_body(s: DaySummary, config: Config) -> list[str]:
     h = s.headline
     if not s.good:
         # Día malo: una sola línea.
-        return [f"<b>{title} · {EMOJI[h.verdict]} {LABEL[h.verdict]}</b> · {escape(h.reason)}"]
+        return [f"<b>{EMOJI[h.verdict]} {LABEL[h.verdict]}</b> · {escape(h.reason)}"]
     level = next(lv for lv in config.levels if lv.id == h.level)
     spot = config.spot(h.spot_id)
     t = fmt_num(h.period) + (" s*" if h.t_estimated else " s")
-    head = f"<b>{title} · {EMOJI[h.verdict]} {LABEL[h.verdict]}</b>" + (" 🤔" if h.doubtful else "")
     lines = [
-        head,
+        f"<b>{EMOJI[h.verdict]} {LABEL[h.verdict]}</b>" + (" 🤔" if h.doubtful else ""),
         f"📍 <b>{escape(spot.short)}</b>, mejor de {h.window[0]} a {h.window[1]} h"
         + (f" ({level.label.lower()})" if h.level != config.levels[0].id else ""),
         timeline_strip(h),
@@ -137,28 +138,34 @@ def day_block(title: str, s: DaySummary, config: Config) -> list[str]:
     lines += [level_line(s.best[lv.id], config) for lv in config.levels if lv.id in s.best]
     others = other_spots(s, config)
     if others:
-        lines += ["", f"<b>Otras playas</b> ({level.label.lower()}): {others}"]
+        lines += ["", f"<b>Otras playas para intentarlo</b> ({level.label.lower()})"] + others
     cams = webcams(s, config)
     if cams:
-        lines.append(cams)
+        lines += ["", cams]
     return lines
 
 
-def build_message(today: DaySummary, tomorrow: DaySummary | None, config: Config) -> Message:
-    lines = [f"🏄 <b>{escape(config.general['title'])}</b> · {fmt_date(today.day)}", ""]
-    lines += day_block("HOY", today, config)
-    if tomorrow is not None:
-        lines += ["", "━━━━━━━━━━", ""] + day_block("MAÑANA", tomorrow, config)
+def day_message(title: str, s: DaySummary, config: Config) -> Message:
+    """Un mensaje por día, con su propio aviso sonoro."""
+    lines = [f"🏄 <b>{escape(config.general['title'])}</b> · <b>{title}</b> {fmt_date(s.day)}", ""]
+    lines += day_body(s, config)
     lines.append("")
-    if today.sst is not None:
-        lines.append(f"🌡️ Agua {round(today.sst)} °C → {wetsuit(today.sst, config)}")
-    lines.append(f"<i>{LEGEND}</i>")
+    if s.sst is not None:
+        lines.append(f"🌡️ Agua {round(s.sst)} °C → {wetsuit(s.sst, config)}")
+    if s.good:
+        lines.append(f"<i>{LEGEND}</i>")
     lines.append(f"<i>{ATTRIBUTION}</i>")
     text = "\n".join(lines)
     if len(text) > MAX_LEN:
         text = text[:MAX_LEN - 1] + "…"
-    notify = today.notify or (tomorrow is not None and tomorrow.notify)
-    return Message(text, notify)
+    return Message(text, s.notify)
+
+
+def build_messages(today: DaySummary, tomorrow: DaySummary | None, config: Config) -> list[Message]:
+    msgs = [day_message("HOY", today, config)]
+    if tomorrow is not None:
+        msgs.append(day_message("MAÑANA", tomorrow, config))
+    return msgs
 
 
 def failure_message(config: Config, day: date) -> Message:

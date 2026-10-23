@@ -40,6 +40,7 @@ class Hour:
     peak_period: float | None = None      # periodo de pico usado para puntuar
     t_estimated: bool = False             # True si el pico sale de medio × peak_factor
     swell_height: float | None = None
+    swell_period: float | None = None
     sst: float | None = None
     wind_speed: float | None = None
     wind_direction: float | None = None
@@ -189,6 +190,7 @@ def parse(config: Config, raw: RawData) -> dict[str, SpotForecast]:
                 peak_period=peak,
                 t_estimated=estimated,
                 swell_height=mv("swell_wave_height"),
+                swell_period=mv("swell_wave_period"),
                 sst=mv("sea_surface_temperature"),
                 wind_speed=wind.get(ts),
                 wind_direction=wdir.get(ts),

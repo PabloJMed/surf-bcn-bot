@@ -159,6 +159,28 @@ class TestLevels(unittest.TestCase):
         self.assertEqual(board_for("avanzado", res["avanzado"].heff, 5.0, CFG), "longboard")
 
 
+class TestShortPeriodAndSwell(unittest.TestCase):
+    def test_short_period_is_never_green(self):
+        # 0,7 m con terral: sin el tope saldría 7,0. Con 4,6 s de periodo, como mucho 🟡.
+        for res in (hour(0.7, 4.6, TERRAL, 8), hour(1.2, 4.9, TERRAL, 8)):
+            for s in res.values():
+                self.assertNotEqual(s.verdict, GREEN, s)
+                self.assertLessEqual(s.notify, CFG.rules["short_period_cap"])
+        self.assertEqual(hour(0.7, 4.6, TERRAL, 8)["principiante"].verdict, YELLOW)
+
+    def test_five_seconds_can_be_green(self):
+        self.assertEqual(hour(0.8, 5.0, TERRAL, 10)["principiante"].verdict, GREEN)
+
+    def test_swell_bonus_only_for_real_groundswell(self):
+        def score(swell_period):
+            c = Conditions(0.5, 135, 6.5, 8, TERRAL, 8, swell_height=0.45,
+                           swell_period=swell_period)
+            return score_hour(c, BCN, CFG)[0].display
+        base = hour(0.5, 6.5, TERRAL, 8)["principiante"].display
+        self.assertEqual(score(3.4), base)                         # mar de viento: sin bonus
+        self.assertAlmostEqual(score(9.0), base + CFG.rules["swell_bonus"])
+
+
 class TestCumulativeInvariants(unittest.TestCase):
     def test_thresholds_are_monotonic_per_spot(self):
         for spot in CFG.spots:

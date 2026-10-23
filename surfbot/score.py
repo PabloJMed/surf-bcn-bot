@@ -114,11 +114,13 @@ class Conditions:
     gusts: float
     swell_height: float = 0.0
     t_estimated: bool = False
+    swell_period: float = 0.0
 
     @classmethod
     def from_hour(cls, h: Hour) -> "Conditions":
         return cls(h.wave_height, h.wave_direction, h.peak_period, h.wind_speed,
-                   h.wind_direction, h.gusts, h.swell_height or 0.0, h.t_estimated)
+                   h.wind_direction, h.gusts, h.swell_height or 0.0, h.t_estimated,
+                   h.swell_period or 0.0)
 
 
 @dataclass
@@ -183,13 +185,18 @@ def _score_level(c: Conditions, spot: Spot, level: Level, rules: dict) -> HourSc
     score = min(0.5 * size + 0.5 * per, min(size, per) + rules["base_cap_margin"])
     adj = wind_adjust(kind, c.wind_speed, rules)
     score += adj
-    if c.wave_height > 0 and c.swell_height >= rules["swell_ratio"] * c.wave_height:
+    if (c.wave_height > 0 and c.swell_height >= rules["swell_ratio"] * c.wave_height
+            and c.swell_period >= rules["swell_min_period"]):
         score += rules["swell_bonus"]
     raw = max(0.0, min(10.0, score))
 
     small = h < level.heff_ideal_min
     display = min(raw, rules["small_day_cap"]) if small else raw   # pinza A
     notify = 0.0 if small else raw
+    if c.period < rules["green_min_period"]:
+        # Periodo corto: como mucho 🟡, ni en el color ni en el aviso.
+        display = min(display, rules["short_period_cap"])
+        notify = min(notify, rules["short_period_cap"])
 
     # Motivo: lo que más ha limitado la puntuación.
     if adj <= -3:

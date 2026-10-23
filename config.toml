@@ -27,8 +27,13 @@ danger_period_min_factor = 0.80
 
 # Puntuación base: 0.5·size + 0.5·period, acotada a min(size, period) + margen
 base_cap_margin = 2.0
-swell_ratio = 0.6             # swell ≥ 0.6 × ola total → +swell_bonus
+swell_ratio = 0.6             # swell ≥ 0.6 × ola total → +swell_bonus…
+swell_min_period = 7.0        # …pero solo si es mar de fondo de verdad (≥ 7 s), no mar de viento
 swell_bonus = 0.5
+
+# Periodo corto: por bueno que sea el viento, una ola de menos de 5 s nunca es 🟢.
+green_min_period = 5.0
+short_period_cap = 6.0
 
 # Pinzas del modelo acumulativo
 small_day_cap = 6.0           # pinza A: Heff < heff_ideal_min del nivel → máximo 6.0
