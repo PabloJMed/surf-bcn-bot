@@ -179,9 +179,10 @@ Con Python < 3.11 en local: `uv run --no-project --python 3.12 python -m surfbot
    ```
 4. Prueba: `gh workflow run daily.yml -f force=true` y `gh run watch`.
 
-El workflow corre a las 4:47 y 5:47 UTC. El script envía en la primera ejecución con hora de
-Madrid ≥ 06:30 que no haya enviado ya hoy (`data/state.json`), así que funciona en horario de
-verano y de invierno y aguanta los retrasos de GitHub. El commit diario de `data/` mantiene el
+El workflow se lanza cada 30 minutos entre las 4:17 y las 9:47 UTC, porque el cron de GitHub
+es "según disponibilidad" y a veces retrasa o pierde disparos. El script envía en la primera
+ejecución con hora de Madrid ≥ 06:30 que no haya enviado ya hoy (`data/state.json`); el resto
+termina al momento. Así funciona en horario de verano y de invierno y aguanta los fallos de GitHub. El commit diario de `data/` mantiene el
 repo activo: GitHub desactiva los cron de repos públicos tras 60 días sin actividad.
 
 ## Seguridad

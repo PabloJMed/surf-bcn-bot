@@ -2,10 +2,11 @@ name: daily
 
 on:
   schedule:
-    # UTC. Cubre las 06:47 de Madrid en verano (4:47 UTC) y en invierno (5:47 UTC).
-    # El script decide si toca enviar: primera ejecución ≥ 06:30 que no haya enviado hoy.
-    - cron: "47 4 * * *"
-    - cron: "47 5 * * *"
+    # UTC, cada 30 min de 4:17 a 9:47 (6:17–11:47 en Madrid en verano, 5:17–10:47 en invierno).
+    # El cron de GitHub es "según disponibilidad": a veces retrasa o pierde disparos, así que
+    # hay muchos intentos. El script envía en el primero con hora local ≥ 06:30 que no haya
+    # enviado ya hoy (data/state.json); los demás terminan al momento sin hacer nada.
+    - cron: "17,47 4-9 * * *"
   workflow_dispatch:
     inputs:
       force:
