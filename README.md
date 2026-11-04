@@ -185,6 +185,25 @@ ejecución con hora de Madrid ≥ 06:30 que no haya enviado ya hoy (`data/state.
 termina al momento. Así funciona en horario de verano y de invierno y aguanta los fallos de GitHub. El commit diario de `data/` mantiene el
 repo activo: GitHub desactiva los cron de repos públicos tras 60 días sin actividad.
 
+### Despertador externo (cron-job.org)
+
+El cron de GitHub lanza el workflow con horas de retraso (en la práctica, entre las 11 y las 13:30).
+Para que el mensaje llegue a su hora, una tarea de [cron-job.org](https://cron-job.org) llama cada
+día a las **06:45 (Europe/Madrid)** a la API de GitHub para lanzar el workflow:
+
+- `POST https://api.github.com/repos/PabloJMed/surf-bcn-bot/actions/workflows/daily.yml/dispatches`
+- Cabeceras: `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28`,
+  `Content-Type: application/json` y `Authorization: Bearer <token>`.
+- Cuerpo: `{"ref":"main"}`. Si va bien, responde `204 No Content`.
+
+El token es un *fine-grained token* limitado a este repo con permiso **Actions: Read and write**
+(no da acceso al código ni a los secrets). **Caduca el 3 de noviembre de 2027**: antes de esa
+fecha hay que crear uno nuevo y cambiarlo en la cabecera `Authorization` de la tarea. GitHub
+avisa de que la versión de API `2022-11-28` dejará de funcionar el 10 de marzo de 2028.
+
+El cron de GitHub se queda de respaldo: el bot solo envía una vez al día (`data/state.json`), y
+si GitHub falla al guardar ese estado, el workflow reintenta el `push`.
+
 ## Seguridad
 
 - El token y el chat_id solo viven en GitHub Actions Secrets y en tu entorno local.
