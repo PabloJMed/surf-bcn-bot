@@ -53,7 +53,15 @@ jobs:
           git add data/
           if git diff --cached --quiet; then
             echo "Sin cambios en data/"
-          else
-            git commit -m "data: $(TZ=Europe/Madrid date +%F)"
-            git push
+            exit 0
           fi
+          git commit -m "data: $(TZ=Europe/Madrid date +%F)"
+          # Si GitHub falla al guardar, el bot no queda marcado como "enviado hoy" y el
+          # siguiente disparo repetiría el mensaje: reintentamos antes de rendirnos.
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            echo "push fallido (intento $i), reintentando…"
+            sleep $((i * 10))
+            git pull --rebase
+          done
+          exit 1
