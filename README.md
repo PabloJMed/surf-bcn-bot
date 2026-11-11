@@ -66,7 +66,7 @@ Todo es hora a hora, entre el amanecer y el atardecer, y todos los números est�
    (calma de 5 km/h o menos +1 venga de donde venga, terral flojo +1, de mar −1 a −5, cruzado 0 a −4) y +0,5 si domina el mar de fondo de verdad
    (≥ 7 s de periodo; el mar de viento no cuenta).
 4. **Veredicto**: ≥ 6,5 🟢 · 4,5–6,5 🟡 · < 4,5 🔴. A menos de 0,5 de un umbral: 🤔 dudoso.
-   Con menos de 5 s de periodo de pico, como mucho 🟡: por buen viento que haga, una ola tan
+   Con menos de 6 s de periodo de pico, como mucho 🟡 (⭐): por buen viento que haga, una ola tan
    corta llega floja y rompe toda a la vez.
 5. **Día**: la ventana es la racha más larga de horas ≥ 4,5 y su media da el color. Una ventana de
    una sola hora queda como mucho en 🟡 y no hace sonar el aviso.

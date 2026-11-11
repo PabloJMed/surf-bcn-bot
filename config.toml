@@ -33,8 +33,9 @@ swell_ratio = 0.6             # swell ≥ 0.6 × ola total → +swell_bonus…
 swell_min_period = 7.0        # …pero solo si es mar de fondo de verdad (≥ 7 s), no mar de viento
 swell_bonus = 0.5
 
-# Periodo corto: por bueno que sea el viento, una ola de menos de 5 s nunca es 🟢.
-green_min_period = 5.0
+# Periodo corto: por bueno que sea el viento, una ola de menos de 6 s nunca pasa de 🟡 (⭐).
+# (Era 5 s; en noviembre de 2026 daba ⭐⭐⭐ a días de 5,3 s que en el agua eran mediocres.)
+green_min_period = 6.0
 short_period_cap = 6.0
 
 # Pinzas del modelo acumulativo
@@ -48,7 +49,9 @@ doubt_margin = 0.5            # a menos de esto de un umbral → "dudoso"
 window_min_hours = 2          # ventana de 1 h → como mucho 🟡 y no hace sonar el aviso
 notify_min = 5.5              # suena si algún nivel tiene ≥ 2 h seguidas con media ≥ esto
 
-period_curve = [[3.8, 0], [4.2, 2.0], [4.6, 4.0], [5.0, 5.5], [5.5, 7.0], [6.0, 8.0], [6.5, 9.0], [7.0, 9.5], [8.0, 10]]
+# Nota del periodo de pico. Por debajo de 6 s es mar de viento: rompe flojo y todo a la vez.
+# (Endurecida en noviembre de 2026: con la anterior, 5,3 s valía 6,4 sobre 10.)
+period_curve = [[3.8, 0], [4.5, 1.0], [5.0, 2.0], [5.5, 3.5], [6.0, 5.0], [7.0, 7.0], [8.0, 8.5], [9.0, 10]]
 
 [rules.wind]
 # Con viento de calm_max km/h o menos no hay viento real: mar liso, lo mejor que puede pasar.

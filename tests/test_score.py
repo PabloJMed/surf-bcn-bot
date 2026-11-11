@@ -76,11 +76,12 @@ class TestEncargoPrincipiante(unittest.TestCase):
         self.check(hour(0.5, 4, MAR, 18), RED)
 
     def test_03_small_clean(self):
-        # Encargo: 🟢 ≈ 6,9 dudoso. Con la curva de periodo sobre pico: 8,5.
-        self.check(hour(0.5, 6.5, TERRAL, 8), GREEN, 8.5)
+        # Encargo: 🟢 ≈ 6,9.
+        self.check(hour(0.5, 6.5, TERRAL, 8), GREEN, 7.0)
 
     def test_04_good_light_onshore(self):
-        self.check(hour(0.8, 7, MAR, 6), GREEN, 8.75)
+        # Encargo: 🟢 ≈ 8.
+        self.check(hour(0.8, 7, MAR, 6), GREEN, 7.5)
 
     def test_05_onshore_choppy(self):
         p = self.check(hour(0.8, 7, MAR, 25), RED)
@@ -96,20 +97,20 @@ class TestEncargoPrincipiante(unittest.TestCase):
         self.check(hour(2.0, 9, E, 35), DANGER)
 
     def test_08_cross_light(self):
-        # Encargo: 🟡 ≈ 5,5. Con la curva de periodo sobre pico: 🟢 8,5.
-        self.check(hour(0.7, 5.5, NE, 8), GREEN, 8.5)
+        # Encargo: 🟡 ≈ 5,5.
+        self.check(hour(0.7, 5.5, NE, 8), YELLOW, 5.5)
 
     def test_09_big_messy(self):
         # Encargo: 🔴 ≈ 3,8. Con el techo de 1,1 m: ⛔.
         self.check(hour(1.3, 6, MAR, 5), DANGER)
 
     def test_10_afternoon_sea_breeze(self):
-        self.check(hour(0.6, 5, MAR, 12), RED, 3.75)
+        # Encargo: 🔴 ≈ 1.
+        self.check(hour(0.6, 5, MAR, 12), RED, 1.0)
 
     def test_11_strong_offshore(self):
-        # Encargo: 🟡 ≈ 6. Con la curva de periodo sobre pico: 🟢 6,75 dudoso.
-        p = self.check(hour(0.8, 7, TERRAL, 30), GREEN, 6.75)
-        self.assertTrue(p.doubtful)
+        # Encargo: 🟡 ≈ 6.
+        self.check(hour(0.8, 7, TERRAL, 30), YELLOW, 5.5)
 
     def test_12_big_long_period(self):
         self.check(hour(1.3, 8.5, TERRAL, 5), DANGER)
@@ -130,13 +131,13 @@ class TestLevels(unittest.TestCase):
         # (Heff, T, dir viento, km/h) → (principiante, intermedio, avanzado)
         ((0.60, 6.0, TERRAL, 10), (GREEN, YELLOW, YELLOW)),
         ((2.00, 9.0, TERRAL, 12), (DANGER, DANGER, GREEN)),
-        ((0.45, 4.4, TERRAL, 8), (YELLOW, YELLOW, YELLOW)),
-        ((0.80, 5.0, TERRAL, 10), (GREEN, GREEN, YELLOW)),
+        ((0.45, 4.4, TERRAL, 8), (RED, RED, RED)),             # 4,4 s: mar de viento
+        ((0.80, 5.0, TERRAL, 10), (YELLOW, YELLOW, YELLOW)),       # 5 s: como mucho 🟡
         ((1.20, 7.0, TERRAL, 12), (DANGER, GREEN, GREEN)),
         ((0.90, 5.5, MAR, 20), (RED, RED, RED)),
         ((1.60, 8.0, TERRAL, 25), (DANGER, GREEN, GREEN)),   # intermedio al filo: techo 1,60
         ((2.60, 10.0, TERRAL, 40), (DANGER, DANGER, DANGER)),
-        ((0.28, 5.0, TERRAL, 8), (FLAT, FLAT, YELLOW)),
+        ((0.28, 5.0, TERRAL, 8), (FLAT, FLAT, RED)),                # casi flat y 5 s
         ((0.60, 6.0, MAR, 25), (RED, RED, RED)),              # avanzado sin veto, pero 1,0
     ]
 
@@ -149,7 +150,7 @@ class TestLevels(unittest.TestCase):
     def test_small_day_is_longboard_not_red_for_advanced(self):
         a = hour(0.6, 6, TERRAL, 10)["avanzado"]
         self.assertEqual(a.verdict, YELLOW)
-        self.assertEqual(a.display, CFG.rules["small_day_cap"])
+        self.assertLessEqual(a.display, CFG.rules["small_day_cap"])
         self.assertEqual(board_for("avanzado", a.heff, a.period, CFG), "longboard")
         self.assertEqual(a.notify, 0.0)   # un 🟡 de cortesía no hace sonar el aviso
 
@@ -161,15 +162,21 @@ class TestLevels(unittest.TestCase):
 
 class TestShortPeriodAndSwell(unittest.TestCase):
     def test_short_period_is_never_green(self):
-        # 0,7 m con terral: sin el tope saldría 7,0. Con 4,6 s de periodo, como mucho 🟡.
-        for res in (hour(0.7, 4.6, TERRAL, 8), hour(1.2, 4.9, TERRAL, 8)):
+        # Por debajo de 6 s, como mucho 🟡 (⭐), por bueno que sea el viento.
+        for res in (hour(0.7, 4.6, TERRAL, 8), hour(1.2, 4.9, TERRAL, 8),
+                    hour(0.8, 5.5, TERRAL, 4), hour(0.8, 5.9, TERRAL, 8)):
             for s in res.values():
                 self.assertNotEqual(s.verdict, GREEN, s)
                 self.assertLessEqual(s.notify, CFG.rules["short_period_cap"])
-        self.assertEqual(hour(0.7, 4.6, TERRAL, 8)["principiante"].verdict, YELLOW)
+        self.assertEqual(hour(0.8, 5.9, TERRAL, 8)["principiante"].verdict, YELLOW)
 
-    def test_five_seconds_can_be_green(self):
-        self.assertEqual(hour(0.8, 5.0, TERRAL, 10)["principiante"].verdict, GREEN)
+    def test_today_11_nov_is_one_star_at_most(self):
+        # 11/11/2026: 0,8 m y 5,3 s en calma daban ⭐⭐⭐; en el agua estaba mediocre.
+        s = hour(0.8, 5.3, TERRAL, 4)["principiante"]
+        self.assertLessEqual(s.display, CFG.rules["short_period_cap"])
+
+    def test_six_seconds_can_be_green(self):
+        self.assertEqual(hour(0.8, 6.0, TERRAL, 10)["principiante"].verdict, GREEN)
 
     def test_swell_bonus_only_for_real_groundswell(self):
         def score(swell_period):
