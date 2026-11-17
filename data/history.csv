@@ -1295,3 +1295,57 @@ run_date,day,spot,level,heff,wave_height,period,t_estimated,wave_dir,wind_kmh,wi
 2026-11-16,2026-11-17,sitges,principiante,0.76,0.80,5.8,0,194,6,291,calma,5.97,yellow,8-15,"periodo corto (5,8 s)",1,1,8-15
 2026-11-16,2026-11-17,sitges,intermedio,0.92,0.98,6.2,0,196,9,265,cruzado,6.01,yellow,8-18,,1,1,12-18
 2026-11-16,2026-11-17,sitges,avanzado,0.83,0.87,5.9,0,195,7,284,cruzado,5.09,yellow,8-18,"pequeño para tu nivel (0,9 m)",0,0,
+2026-11-17,2026-11-17,masnou,principiante,0.47,0.78,5.6,0,202,21,265,terral,4.50,red,,"periodo corto (5,6 s)",0,0,
+2026-11-17,2026-11-17,masnou,intermedio,0.52,0.85,6.2,0,202,24,271,terral,4.75,yellow,14-17,"pequeño para tu nivel (0,5 m)",0,0,
+2026-11-17,2026-11-17,masnou,avanzado,0.52,0.85,6.2,0,202,24,271,terral,4.83,yellow,14-17,"pequeño para tu nivel (0,5 m)",0,0,
+2026-11-17,2026-11-17,montgat,principiante,0.50,0.83,6.1,0,202,20,260,terral,5.55,yellow,13-16,"periodo corto (6,1 s)",1,1,13-16
+2026-11-17,2026-11-17,montgat,intermedio,0.50,0.83,6.1,0,202,20,260,terral,4.80,yellow,13-16,"pequeño para tu nivel (0,5 m)",0,0,
+2026-11-17,2026-11-17,montgat,avanzado,0.50,0.83,6.1,0,202,20,260,terral,4.80,yellow,13-16,"pequeño para tu nivel (0,5 m)",0,0,
+2026-11-17,2026-11-17,bogatell,principiante,0.60,0.92,6.4,0,204,21,262,terral,6.91,green,14-16,,1,2,14-16
+2026-11-17,2026-11-17,bogatell,intermedio,0.60,0.92,6.4,0,204,21,262,terral,5.15,yellow,14-16,"pequeño para tu nivel (0,6 m)",0,0,
+2026-11-17,2026-11-17,bogatell,avanzado,0.60,0.92,6.4,0,204,21,262,terral,4.90,yellow,14-16,"pequeño para tu nivel (0,6 m)",0,0,
+2026-11-17,2026-11-17,barceloneta,principiante,0.58,0.98,6.3,0,203,20,260,terral,6.60,green,13-16,,1,2,13-16
+2026-11-17,2026-11-17,barceloneta,intermedio,0.58,0.98,6.3,0,203,20,260,terral,4.99,yellow,13-16,"pequeño para tu nivel (0,6 m)",0,0,
+2026-11-17,2026-11-17,barceloneta,avanzado,0.58,0.98,6.3,0,203,20,260,terral,4.87,yellow,13-16,"pequeño para tu nivel (0,6 m)",0,0,
+2026-11-17,2026-11-17,prat,principiante,0.81,0.98,6.0,0,207,11,247,cruzado,5.31,yellow,8-16,viento cruzado 13 km/h,0,1,8-16
+2026-11-17,2026-11-17,prat,intermedio,0.94,1.13,6.4,0,207,13,238,cruzado,5.18,yellow,8-18,viento cruzado 12 km/h,0,1,13-18
+2026-11-17,2026-11-17,prat,avanzado,0.85,1.02,6.1,0,207,12,244,cruzado,4.80,yellow,8-18,viento cruzado 12 km/h,0,0,
+2026-11-17,2026-11-17,castelldefels,principiante,0.74,0.96,6.1,0,203,12,244,cruzado,5.57,yellow,8-18,viento cruzado 12 km/h,1,1,8-18
+2026-11-17,2026-11-17,castelldefels,intermedio,0.85,1.10,6.5,0,203,14,235,cruzado,4.89,yellow,8-18,viento cruzado 12 km/h,0,1,14-18
+2026-11-17,2026-11-17,castelldefels,avanzado,0.74,0.96,6.1,0,203,12,244,cruzado,4.80,yellow,8-18,viento cruzado 12 km/h,0,0,
+2026-11-17,2026-11-17,ginesta,principiante,0.63,0.76,5.5,0,202,10,281,terral,0.00,danger,,"demasiado grande para tu nivel (0,6 m)",0,0,
+2026-11-17,2026-11-17,ginesta,intermedio,0.90,1.10,6.5,0,203,14,252,cruzado,5.25,yellow,14-18,viento cruzado 13 km/h,0,1,14-18
+2026-11-17,2026-11-17,ginesta,avanzado,0.90,1.10,6.5,0,203,14,252,cruzado,4.80,yellow,14-18,viento cruzado 13 km/h,0,0,
+2026-11-17,2026-11-17,garraf,principiante,0.71,0.74,5.6,0,199,9,278,cruzado,4.91,yellow,11-14,viento cruzado 14 km/h,1,1,8-10
+2026-11-17,2026-11-17,garraf,intermedio,0.97,1.02,6.4,0,200,14,258,cruzado,5.34,yellow,11-18,viento cruzado 14 km/h,0,1,12-18
+2026-11-17,2026-11-17,garraf,avanzado,0.95,1.00,6.3,0,200,14,259,cruzado,4.80,yellow,11-18,viento cruzado 14 km/h,0,0,
+2026-11-17,2026-11-17,sitges,principiante,0.82,0.89,6.1,0,198,7,279,cruzado,6.25,yellow,8-18,,1,1,8-18
+2026-11-17,2026-11-17,sitges,intermedio,0.88,0.96,6.3,0,198,8,261,cruzado,6.34,yellow,8-18,,1,2,11-18
+2026-11-17,2026-11-17,sitges,avanzado,0.82,0.89,6.1,0,198,7,279,cruzado,5.17,yellow,8-18,"pequeño para tu nivel (0,8 m)",0,0,
+2026-11-17,2026-11-18,masnou,principiante,0.51,0.89,7.0,0,205,17,272,terral,7.00,green,10-17,,1,2,10-17
+2026-11-17,2026-11-18,masnou,intermedio,0.51,0.90,7.0,0,205,17,271,terral,5.68,yellow,9-17,"pequeño para tu nivel (0,5 m)",0,0,
+2026-11-17,2026-11-18,masnou,avanzado,0.51,0.91,7.0,0,205,17,272,terral,5.66,yellow,8-17,"pequeño para tu nivel (0,5 m)",0,0,
+2026-11-17,2026-11-18,montgat,principiante,0.51,0.91,7.0,0,205,12,253,cruzado,5.93,yellow,8-17,viento cruzado 12 km/h,1,1,8-17
+2026-11-17,2026-11-18,montgat,intermedio,0.51,0.91,7.0,0,205,12,253,cruzado,5.31,yellow,8-17,viento cruzado 12 km/h,0,0,
+2026-11-17,2026-11-18,montgat,avanzado,0.51,0.91,7.0,0,205,12,253,cruzado,5.31,yellow,8-17,viento cruzado 12 km/h,0,0,
+2026-11-17,2026-11-18,bogatell,principiante,0.60,1.00,7.0,0,208,12,253,cruzado,6.77,green,8-17,,1,2,8-17
+2026-11-17,2026-11-18,bogatell,intermedio,0.60,1.00,7.0,0,208,12,253,cruzado,5.36,yellow,8-17,viento cruzado 12 km/h,0,0,
+2026-11-17,2026-11-18,bogatell,avanzado,0.60,1.00,7.0,0,208,12,253,cruzado,5.30,yellow,8-17,viento cruzado 12 km/h,0,0,
+2026-11-17,2026-11-18,barceloneta,principiante,0.58,1.10,7.0,0,208,12,253,cruzado,6.62,green,8-17,,1,2,8-17
+2026-11-17,2026-11-18,barceloneta,intermedio,0.58,1.10,7.0,0,208,12,253,cruzado,5.34,yellow,8-17,viento cruzado 12 km/h,0,0,
+2026-11-17,2026-11-18,barceloneta,avanzado,0.58,1.10,7.0,0,208,12,253,cruzado,5.30,yellow,8-17,viento cruzado 12 km/h,0,0,
+2026-11-17,2026-11-18,prat,principiante,0.93,1.20,6.9,0,213,12,234,cruzado,5.40,yellow,8-18,viento cruzado 13 km/h,0,1,8-18
+2026-11-17,2026-11-18,prat,intermedio,0.93,1.20,6.9,0,213,12,234,cruzado,5.99,yellow,8-18,viento cruzado 13 km/h,1,1,8-18
+2026-11-17,2026-11-18,prat,avanzado,0.93,1.20,6.9,0,213,12,234,cruzado,4.92,yellow,8-18,viento cruzado 13 km/h,0,0,
+2026-11-17,2026-11-18,castelldefels,principiante,0.82,1.13,6.9,0,208,12,234,cruzado,6.60,green,8-18,,1,2,8-18
+2026-11-17,2026-11-18,castelldefels,intermedio,0.82,1.13,6.9,0,208,12,234,cruzado,5.44,yellow,8-18,viento cruzado 13 km/h,0,1,8-18
+2026-11-17,2026-11-18,castelldefels,avanzado,0.82,1.13,6.9,0,208,12,234,cruzado,4.91,yellow,8-18,viento cruzado 13 km/h,0,0,
+2026-11-17,2026-11-18,ginesta,principiante,0.92,1.24,7.0,0,211,13,265,cruzado,0.00,danger,,"demasiado grande para tu nivel (0,9 m)",0,0,
+2026-11-17,2026-11-18,ginesta,intermedio,0.88,1.13,6.9,0,208,14,253,cruzado,5.73,yellow,8-18,viento cruzado 14 km/h,1,1,8-18
+2026-11-17,2026-11-18,ginesta,avanzado,0.88,1.13,6.9,0,208,14,253,cruzado,4.89,yellow,8-18,viento cruzado 14 km/h,0,0,
+2026-11-17,2026-11-18,garraf,principiante,0.95,1.04,6.9,0,204,15,252,cruzado,4.93,yellow,12-16,viento cruzado 16 km/h,0,1,12-16
+2026-11-17,2026-11-18,garraf,intermedio,0.98,1.08,6.9,0,205,14,253,cruzado,6.18,yellow,8-18,viento cruzado 14 km/h,1,1,8-18
+2026-11-17,2026-11-18,garraf,avanzado,0.98,1.08,6.9,0,205,14,253,cruzado,4.92,yellow,8-18,viento cruzado 14 km/h,0,0,
+2026-11-17,2026-11-18,sitges,principiante,0.91,1.04,6.9,0,202,10,258,cruzado,6.43,yellow,8-18,viento cruzado 13 km/h,1,1,8-18
+2026-11-17,2026-11-18,sitges,intermedio,0.91,1.04,6.9,0,202,10,258,cruzado,6.71,green,8-18,,1,2,8-18
+2026-11-17,2026-11-18,sitges,avanzado,0.91,1.04,6.9,0,202,10,258,cruzado,5.25,yellow,8-18,viento cruzado 13 km/h,0,0,
