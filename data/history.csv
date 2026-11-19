@@ -1403,3 +1403,57 @@ run_date,day,spot,level,heff,wave_height,period,t_estimated,wave_dir,wind_kmh,wi
 2026-11-18,2026-11-19,sitges,principiante,1.57,1.76,7.6,0,201,16,285,terral,0.00,danger,,"demasiado grande para tu nivel (1,6 m)",0,0,
 2026-11-18,2026-11-19,sitges,intermedio,1.47,1.73,7.5,0,205,18,284,terral,8.76,green,8-11,,1,4,8-11
 2026-11-18,2026-11-19,sitges,avanzado,1.47,1.73,7.5,0,205,18,284,terral,8.70,green,8-11,,1,4,8-11
+2026-11-19,2026-11-19,masnou,principiante,0.82,1.52,7.8,0,207,22,287,terral,0.00,danger,,rachas de 59 km/h,0,0,
+2026-11-19,2026-11-19,masnou,intermedio,0.82,1.52,7.8,0,207,22,287,terral,0.00,danger,,rachas de 59 km/h,0,0,
+2026-11-19,2026-11-19,masnou,avanzado,0.82,1.52,7.8,0,207,22,287,terral,0.00,danger,,rachas de 59 km/h,0,0,
+2026-11-19,2026-11-19,montgat,principiante,0.80,1.50,7.8,0,208,24,286,terral,7.60,green,8-10,,1,3,8-10
+2026-11-19,2026-11-19,montgat,intermedio,0.80,1.50,7.8,0,208,24,286,terral,6.40,yellow,8-10,terral fuerte 25 km/h,1,1,8-10
+2026-11-19,2026-11-19,montgat,avanzado,0.80,1.50,7.8,0,208,24,286,terral,5.40,yellow,8-10,terral fuerte 25 km/h,0,0,
+2026-11-19,2026-11-19,bogatell,principiante,0.95,1.67,7.7,0,210,24,286,terral,6.00,yellow,8-10,terral fuerte 25 km/h,1,1,8-10
+2026-11-19,2026-11-19,bogatell,intermedio,0.91,1.65,7.6,0,211,26,281,terral,6.25,yellow,8-11,terral fuerte 25 km/h,1,1,8-11
+2026-11-19,2026-11-19,bogatell,avanzado,0.91,1.65,7.6,0,211,26,281,terral,5.20,yellow,8-11,terral fuerte 25 km/h,0,0,
+2026-11-19,2026-11-19,barceloneta,principiante,0.95,1.89,7.7,0,210,24,286,terral,6.02,yellow,8-10,terral fuerte 25 km/h,1,1,8-10
+2026-11-19,2026-11-19,barceloneta,intermedio,0.91,1.89,7.6,0,211,26,281,terral,6.26,yellow,8-11,terral fuerte 25 km/h,1,1,8-11
+2026-11-19,2026-11-19,barceloneta,avanzado,0.91,1.89,7.6,0,211,26,281,terral,5.20,yellow,8-11,terral fuerte 25 km/h,0,0,
+2026-11-19,2026-11-19,prat,principiante,1.53,2.10,7.6,0,217,15,288,terral,0.00,danger,,"demasiado grande para tu nivel (1,5 m)",0,0,
+2026-11-19,2026-11-19,prat,intermedio,1.45,2.12,7.5,0,221,19,281,terral,7.47,green,8-11,,1,2,8-11
+2026-11-19,2026-11-19,prat,avanzado,1.49,2.11,7.5,0,219,17,285,terral,7.42,green,8-11,,1,4,8-10
+2026-11-19,2026-11-19,castelldefels,principiante,1.35,2.00,7.6,0,212,15,288,terral,0.00,danger,,"demasiado grande para tu nivel (1,3 m)",0,0,
+2026-11-19,2026-11-19,castelldefels,intermedio,1.23,1.99,7.5,0,216,19,281,terral,8.88,green,8-11,,1,4,8-11
+2026-11-19,2026-11-19,castelldefels,avanzado,1.23,1.99,7.5,0,216,19,281,terral,7.98,green,8-11,,1,3,8-11
+2026-11-19,2026-11-19,ginesta,principiante,1.46,2.00,7.6,0,212,23,290,terral,0.00,danger,,"demasiado grande para tu nivel (1,5 m)",0,0,
+2026-11-19,2026-11-19,ginesta,intermedio,1.46,2.00,7.6,0,212,23,290,terral,0.00,danger,,rachas de 50 km/h,0,0,
+2026-11-19,2026-11-19,ginesta,avanzado,1.41,1.99,7.5,0,214,25,288,terral,7.10,green,8-10,,1,2,8-10
+2026-11-19,2026-11-19,garraf,principiante,1.65,1.92,7.6,0,209,23,290,terral,0.00,danger,,"demasiado grande para tu nivel (1,7 m)",0,0,
+2026-11-19,2026-11-19,garraf,intermedio,1.65,1.92,7.6,0,209,23,290,terral,0.00,danger,,"demasiado grande para tu nivel (1,7 m)",0,0,
+2026-11-19,2026-11-19,garraf,avanzado,1.61,1.91,7.5,0,210,25,288,terral,7.39,green,8-10,,1,2,8-10
+2026-11-19,2026-11-19,sitges,principiante,1.58,1.84,7.6,0,204,17,290,terral,0.00,danger,,"demasiado grande para tu nivel (1,6 m)",0,0,
+2026-11-19,2026-11-19,sitges,intermedio,1.54,1.83,7.5,0,206,18,288,terral,8.64,green,8-10,,1,4,8-10
+2026-11-19,2026-11-19,sitges,avanzado,1.49,1.81,7.5,0,208,20,285,terral,8.70,green,8-11,,1,4,8-11
+2026-11-19,2026-11-20,masnou,principiante,0.25,0.70,6.7,0,221,6,324,terral,0.00,flat,,"flat (0,2 m)",0,0,
+2026-11-19,2026-11-20,masnou,intermedio,0.25,0.70,6.7,0,221,6,324,terral,0.00,flat,,"flat (0,2 m)",0,0,
+2026-11-19,2026-11-20,masnou,avanzado,0.25,0.60,6.6,0,216,9,302,terral,6.00,yellow,9-15,"pequeño para tu nivel (0,3 m)",0,0,
+2026-11-19,2026-11-20,montgat,principiante,0.25,0.70,6.7,0,221,8,321,terral,0.00,flat,,"flat (0,2 m)",0,0,
+2026-11-19,2026-11-20,montgat,intermedio,0.25,0.70,6.7,0,221,8,321,terral,0.00,flat,,"flat (0,2 m)",0,0,
+2026-11-19,2026-11-20,montgat,avanzado,0.25,0.60,6.6,0,216,10,300,terral,6.00,yellow,9-15,"pequeño para tu nivel (0,3 m)",0,0,
+2026-11-19,2026-11-20,bogatell,principiante,0.31,0.70,6.1,0,219,10,303,terral,3.38,red,,"pequeño para tu nivel (0,3 m)",0,0,
+2026-11-19,2026-11-20,bogatell,intermedio,0.31,0.72,6.1,0,220,9,305,terral,5.60,yellow,8-14,"pequeño para tu nivel (0,3 m)",0,0,
+2026-11-19,2026-11-20,bogatell,avanzado,0.30,0.69,6.0,0,219,9,301,terral,5.48,yellow,8-17,"pequeño para tu nivel (0,3 m)",0,0,
+2026-11-19,2026-11-20,barceloneta,principiante,0.31,0.82,6.1,0,219,10,303,terral,3.35,red,,"pequeño para tu nivel (0,3 m)",0,0,
+2026-11-19,2026-11-20,barceloneta,intermedio,0.31,0.81,6.1,0,219,10,300,terral,5.58,yellow,10-14,"pequeño para tu nivel (0,3 m)",0,0,
+2026-11-19,2026-11-20,barceloneta,avanzado,0.30,0.80,6.0,0,219,9,301,terral,5.48,yellow,8-17,"pequeño para tu nivel (0,3 m)",0,0,
+2026-11-19,2026-11-20,prat,principiante,0.55,0.94,6.1,0,228,8,316,terral,6.90,green,8-17,,1,2,8-17
+2026-11-19,2026-11-20,prat,intermedio,0.55,0.94,6.1,0,228,8,316,terral,5.60,yellow,8-17,"pequeño para tu nivel (0,6 m)",0,0,
+2026-11-19,2026-11-20,prat,avanzado,0.55,0.94,6.1,0,228,8,316,terral,5.53,yellow,8-17,"pequeño para tu nivel (0,6 m)",0,0,
+2026-11-19,2026-11-20,castelldefels,principiante,0.47,0.90,6.2,0,223,5,334,calma,5.69,yellow,8-16,"pequeño para tu nivel (0,4 m)",1,1,8-11
+2026-11-19,2026-11-20,castelldefels,intermedio,0.44,0.84,6.1,0,224,8,316,terral,5.53,yellow,8-17,"pequeño para tu nivel (0,4 m)",0,0,
+2026-11-19,2026-11-20,castelldefels,avanzado,0.44,0.84,6.1,0,224,8,316,terral,5.53,yellow,8-17,"pequeño para tu nivel (0,4 m)",0,0,
+2026-11-19,2026-11-20,ginesta,principiante,0.50,0.85,6.1,0,224,15,300,terral,6.00,yellow,8-17,"periodo corto (6,1 s)",1,1,8-16
+2026-11-19,2026-11-20,ginesta,intermedio,0.49,0.84,6.1,0,224,15,299,terral,5.29,yellow,8-17,"pequeño para tu nivel (0,5 m)",0,0,
+2026-11-19,2026-11-20,ginesta,avanzado,0.49,0.84,6.1,0,224,15,299,terral,5.28,yellow,8-17,"pequeño para tu nivel (0,5 m)",0,0,
+2026-11-19,2026-11-20,garraf,principiante,0.59,0.79,6.1,0,221,15,299,terral,6.95,green,8-17,,1,2,8-17
+2026-11-19,2026-11-20,garraf,intermedio,0.59,0.79,6.1,0,221,15,299,terral,5.41,yellow,8-17,"pequeño para tu nivel (0,6 m)",0,0,
+2026-11-19,2026-11-20,garraf,avanzado,0.59,0.79,6.1,0,221,15,299,terral,5.28,yellow,8-17,"pequeño para tu nivel (0,6 m)",0,0,
+2026-11-19,2026-11-20,sitges,principiante,0.52,0.72,6.0,0,217,12,297,terral,6.44,yellow,8-18,periodo corto (6 s),1,1,8-18
+2026-11-19,2026-11-20,sitges,intermedio,0.52,0.72,6.0,0,217,12,297,terral,5.37,yellow,8-18,"pequeño para tu nivel (0,5 m)",0,0,
+2026-11-19,2026-11-20,sitges,avanzado,0.52,0.72,6.0,0,217,12,297,terral,5.31,yellow,8-18,"pequeño para tu nivel (0,5 m)",0,0,
